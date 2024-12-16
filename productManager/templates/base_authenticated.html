@@ -14,7 +14,25 @@
 
 <body>
     <div id="content">
-        {% block content %}{% endblock %}
+
+
+        {% if user.is_authenticated %}
+            {% block content %}
+            {% endblock %}
+        {% else %}
+        <div class="container d-flex justify-content-center align-items-center min-vh-100">
+            <div class="card p-4" style="max-width: 400px; width: 100%; border-radius: 10px;">
+                <h2 class="text-center mb-4">Non authenticated user</h2>        
+            </div>
+        </div>
+        {% endif%}
+
+
+
+
+
+
+
     </div>
 </body>
 </html>

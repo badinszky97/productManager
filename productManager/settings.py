@@ -123,7 +123,6 @@ USE_TZ = True
 STATIC_URL = os.path.join(BASE_DIR,'productManager/static/')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "productManager", "static"),
-    os.path.join(BASE_DIR, "static"),
 ]
 
 # Default primary key field type

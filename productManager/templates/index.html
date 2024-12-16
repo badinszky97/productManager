@@ -4,5 +4,31 @@
 
 {% block content %}
 
-Ez a block
+{% if user.is_authenticated %}
+  BE VAN LEPVE
+{% else %}
+  NINCS BELEPVE
+
+{% endif%}
+
+{% if user.is_authenticated %}
+<p>Welcome {{ user.username }} !!!</p>       
+{% endif %}
+
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card p-4" style="max-width: 400px; width: 100%; border-radius: 10px;">
+      <h2 class="text-center mb-4">Product Manager</h2>
+
+      <form action="/" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" class="btn btn-primary w-100 mt-3" value="Login">
+      </form>
+
+  </div>
+</div>
+
 {% endblock %}
+
+

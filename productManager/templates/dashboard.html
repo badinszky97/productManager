@@ -1,0 +1,24 @@
+{% extends "base_authenticated.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  BE VAN LEPVE
+{% else %}
+  NINCS BELEPVE
+
+{% endif%}
+
+{% if user.is_authenticated %}
+<p>Welcome {{ user.username }} !!!</p>       
+{% endif %}
+
+<a href="/logout">logout</a>
+
+
+
+{% endblock %}
+
+
