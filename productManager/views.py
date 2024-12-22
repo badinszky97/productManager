@@ -40,8 +40,6 @@ def get_name(request):
     return render(request, "index.html", {"form": form})
 
 def index(request):
-
-    # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html')
 
 # **************************************************
@@ -62,7 +60,7 @@ def element_add(request, type, url):
             if form.is_valid():
                 newPart = Element(0, request.POST["name"], type, request.POST["code"], 0)
                 newPart.createInDatabase()
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(url) # redirect if successful
     else:
         return HttpResponseRedirect("/")
 
@@ -70,23 +68,11 @@ def element_add(request, type, url):
 # Operations
 # **************************************************
 def operations_view(request):
-    all_parts = get_all_elements("Operation")
-    for item in all_parts:
-        print("****" + str(item))
-    newElementForm = NewElementForm()
-    # Render the HTML template index.html with the data in the context variable
-    return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : newElementForm, "type" : "Operation"})
+    all_operations = get_all_elements("Operation")
+    return render(request, 'elements.html', {"elements": all_operations, "newElementForm" : NewElementForm(), "type" : "Operation"})
 
 def operations_add_view(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            form = NewElementForm(request.POST)
-            if form.is_valid():
-                newPart = Element(0, request.POST["name"], "Operation", request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect("/operations")
-    else:
-        return HttpResponseRedirect("/")
+    element_add(request, "Operation", "/operations")
 
 # **************************************************
 # Parts
@@ -96,15 +82,7 @@ def parts_view(request):
     return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : NewElementForm(), "type" : "Part"})
 
 def parts_add_view(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            form = NewElementForm(request.POST)
-            if form.is_valid():
-                newPart = Element(0, request.POST["name"], "Part", request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect("/parts")
-    else:
-        return HttpResponseRedirect("/")
+    element_add(request, "Part", "/parts")
 
 # **************************************************
 # Assemblies
@@ -114,15 +92,7 @@ def assemblies_view(request):
     return render(request, 'elements.html', {"elements": all_assemblies, "newElementForm" : NewElementForm(), "type" : "Assembly"})
 
 def assemblies_add_view(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            form = NewElementForm(request.POST)
-            if form.is_valid():
-                newPart = Element(0, request.POST["name"], "Assembly", request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect("/assemblies")
-    else:
-        return HttpResponseRedirect("/")
+    element_add(request, "Assembly", "/assemblies")
 
 # **************************************************
 # Products
@@ -133,16 +103,8 @@ def products_view(request):
 
 def products_add_view(request):
     if request.user.is_authenticated:
-        if request.method == "POST":
-            form = NewElementForm(request.POST)
-            if form.is_valid():
-                newPart = Element(0, request.POST["name"], "Product", request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect("/products")
-    else:
-        return HttpResponseRedirect("/")
+        element_add(request, "Product", "/products")
     
-
 # **************************************************
 # Projects
 # **************************************************
@@ -151,16 +113,7 @@ def projects_view(request):
     return render(request, 'elements.html', {"elements": all_projects, "newElementForm" : NewElementForm(), "type" : "Project"})
 
 def projects_add_view(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
-            form = NewElementForm(request.POST)
-            if form.is_valid():
-                newPart = Element(0, request.POST["name"], "Project", request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect("/projects")
-    else:
-        return HttpResponseRedirect("/")
-
+    element_add(request, "Project", "/projects")
 
 # **************************************************
 # Media
