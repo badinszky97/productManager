@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import mariadb
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,6 +92,18 @@ DATABASES = {
         'database' : "product_manager",
     }
 }
+
+def get_database_connection():
+    try:
+        return mariadb.connect(
+                user=DATABASES["product_manager"]["user"],
+                password=DATABASES["product_manager"]["passwd"],
+                host=DATABASES["product_manager"]["host"],
+                port=3306,
+                database=DATABASES["product_manager"]["database"])
+    except mariadb.Error as e:
+        print(f"Error connecting to MariaDB Platform: {e}")
+        return None
 
 
 # Password validation

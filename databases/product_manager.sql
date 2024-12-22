@@ -1,0 +1,292 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: db
+-- Generation Time: Dec 22, 2024 at 07:16 AM
+-- Server version: 11.6.2-MariaDB-ubu2404
+-- PHP Version: 8.2.26
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `product_manager`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `consist`
+--
+
+CREATE TABLE `consist` (
+  `Container` int(11) NOT NULL,
+  `Element` int(11) NOT NULL,
+  `Pieces` int(10) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `elements`
+--
+
+CREATE TABLE `elements` (
+  `ID` int(11) NOT NULL,
+  `Name` varchar(30) NOT NULL,
+  `Type` int(11) NOT NULL,
+  `Code` varchar(10) NOT NULL,
+  `InStock` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `element_types`
+--
+
+CREATE TABLE `element_types` (
+  `ID` int(11) NOT NULL,
+  `Description` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `element_types`
+--
+
+INSERT INTO `element_types` (`ID`, `Description`) VALUES
+(1, 'Part'),
+(2, 'Operation'),
+(3, 'Assembly'),
+(4, 'Product'),
+(5, 'Project');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `files`
+--
+
+CREATE TABLE `files` (
+  `ID` int(11) NOT NULL,
+  `ElementID` int(11) NOT NULL,
+  `FileType` int(11) NOT NULL,
+  `Description` varchar(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `file_types`
+--
+
+CREATE TABLE `file_types` (
+  `ID` int(11) NOT NULL,
+  `Description` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `file_types`
+--
+
+INSERT INTO `file_types` (`ID`, `Description`) VALUES
+(1, 'Image'),
+(2, 'PDF');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orderable`
+--
+
+CREATE TABLE `orderable` (
+  `ID` int(11) NOT NULL,
+  `VendorCode` int(11) NOT NULL,
+  `ElementCode` int(11) NOT NULL,
+  `Price` float NOT NULL,
+  `PriceUnit` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `price_units`
+--
+
+CREATE TABLE `price_units` (
+  `ID` int(11) NOT NULL,
+  `UnitType` varchar(10) NOT NULL,
+  `ShortTerm` varchar(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `price_units`
+--
+
+INSERT INTO `price_units` (`ID`, `UnitType`, `ShortTerm`) VALUES
+(1, 'HUF', 'Ft'),
+(2, 'EUR', '€'),
+(3, 'USD', '$');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vendors`
+--
+
+CREATE TABLE `vendors` (
+  `ID` int(11) NOT NULL,
+  `Company` varchar(20) NOT NULL,
+  `Address` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `consist`
+--
+ALTER TABLE `consist`
+  ADD UNIQUE KEY `ContElementIndex` (`Container`,`Element`) USING BTREE,
+  ADD KEY `Element` (`Element`);
+
+--
+-- Indexes for table `elements`
+--
+ALTER TABLE `elements`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `CodeUnique` (`Code`),
+  ADD KEY `TypeIndex` (`Type`);
+
+--
+-- Indexes for table `element_types`
+--
+ALTER TABLE `element_types`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `files`
+--
+ALTER TABLE `files`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `FileTypeIndex` (`FileType`),
+  ADD KEY `ElementIDIndex` (`ElementID`);
+
+--
+-- Indexes for table `file_types`
+--
+ALTER TABLE `file_types`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `orderable`
+--
+ALTER TABLE `orderable`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `VendorCodeIndex` (`VendorCode`),
+  ADD KEY `ElementCodeIndex` (`ElementCode`),
+  ADD KEY `PriceUnitIndex` (`PriceUnit`);
+
+--
+-- Indexes for table `price_units`
+--
+ALTER TABLE `price_units`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `vendors`
+--
+ALTER TABLE `vendors`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `elements`
+--
+ALTER TABLE `elements`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `element_types`
+--
+ALTER TABLE `element_types`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `files`
+--
+ALTER TABLE `files`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `file_types`
+--
+ALTER TABLE `file_types`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `orderable`
+--
+ALTER TABLE `orderable`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `price_units`
+--
+ALTER TABLE `price_units`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `vendors`
+--
+ALTER TABLE `vendors`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `consist`
+--
+ALTER TABLE `consist`
+  ADD CONSTRAINT `consist_ibfk_1` FOREIGN KEY (`Container`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `consist_ibfk_2` FOREIGN KEY (`Element`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `elements`
+--
+ALTER TABLE `elements`
+  ADD CONSTRAINT `elements_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `element_types` (`ID`) ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `files`
+--
+ALTER TABLE `files`
+  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`FileType`) REFERENCES `file_types` (`ID`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `files_ibfk_2` FOREIGN KEY (`ElementID`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `orderable`
+--
+ALTER TABLE `orderable`
+  ADD CONSTRAINT `orderable_ibfk_1` FOREIGN KEY (`PriceUnit`) REFERENCES `price_units` (`ID`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `orderable_ibfk_2` FOREIGN KEY (`VendorCode`) REFERENCES `vendors` (`ID`) ON UPDATE NO ACTION,
+  ADD CONSTRAINT `orderable_ibfk_3` FOREIGN KEY (`ElementCode`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

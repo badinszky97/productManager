@@ -2,12 +2,11 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-import mysql.connector
-from .settings import DATABASES
-import mariadb
-
+from .elements import get_all_parts
+from .elements import Part
 
 from .forms import Loginform
+from .forms import NewPartForm
 
 
 def get_name(request):
@@ -43,29 +42,21 @@ def index(request):
     return render(request, 'index.html')
 
 def parts_view(request):
-
-    try:
-        conn = mariadb.connect(
-            user=DATABASES["product_manager"]["user"],
-            password=DATABASES["product_manager"]["passwd"],
-            host=DATABASES["product_manager"]["host"],
-            port=3306,
-            database=DATABASES["product_manager"]["database"]
-
-        )
-                # Get Cursor
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM file_types")
-        for (id, desc) in cur:
-            print(f"First Name: {id}, Last Name: {desc}")
-    except mariadb.Error as e:
-        print(f"Error connecting to MariaDB Platform: {e}")
-
-
-
-
+    all_parts = get_all_parts()
+    for item in all_parts:
+        print(str(item))
+    newPartForm = NewPartForm()
     # Render the HTML template index.html with the data in the context variable
-    return render(request, 'parts.html')
+    return render(request, 'parts.html', {"parts": all_parts, "newPartForm" : newPartForm})
+
+def parts_add_view(request):
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = NewPartForm(request.POST)
+            if form.is_valid():
+                newPart = Part(0, request.POST["name"], 0, request.POST["code"], 0)
+                newPart.createInDatabase()
+    return HttpResponseRedirect("/parts")
 
 def logout_view(request):
     if request.user.is_authenticated == True:
