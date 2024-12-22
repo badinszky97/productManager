@@ -93,6 +93,10 @@ DATABASES = {
     }
 }
 
+PRODUCTMANAGER_VARIABLES = {
+    'media_path' : '/var/product_manager/'
+}
+
 def get_database_connection():
     try:
         return mariadb.connect(

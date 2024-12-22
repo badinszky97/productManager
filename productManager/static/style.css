@@ -7,9 +7,11 @@ body{
 }
 
 .container {
+  margin-top:100px;
     display: block;;
     height: 100vh;
     width: 100vw;
+    max-width: 90vw !important;
 }
 
 .container > div {
@@ -17,9 +19,19 @@ body{
   color:white;
 }
 
+.media_container
+{
+  margin-top:100px;
+  margin-left:50px;
+  margin-right:50px;
+  display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 #bodycontent
 {
-  width:100vw;
+  margin-top:50px;
   margin-left:auto;
   margin-right:auto;
   text-align:center;
@@ -27,6 +39,9 @@ body{
 
 nav {
   width:100vw;
+  position: fixed !important;
+  z-index: 1;
+  top:0px;
 }
 
 h1 {
@@ -46,3 +61,32 @@ a:link {color:#FFFAFA;}
 a:visited {color:#FFFAFA;}
 a:hover {color:#FFFAFA;}
 a:active {color:#FFFAFA;}
+
+#element_icon
+{
+  margin-top:10px;
+  width:10vw;
+}
+
+.table_icon{
+  width: 50px;
+}
+
+.linkstyle
+{ cursor: pointer; } /* For table pointer */
+
+.element_table
+{
+  width :90%;
+  margin-left:auto;
+  margin-right:auto;
+
+}
+.element_table tr{
+  padding-top:10px;
+  padding-bottom:10px;
+}
+.element_table tr td{
+  padding-top:10px;
+  padding-bottom:10px;
+}

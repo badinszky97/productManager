@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{type}}{% endblock %}
+
+{% block content %}
+
+
+<!-- Add new part trigger modal -->
+<button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#AddNewElementModal">
+    Add New {{type}}
+  </button>
+  <!-- Modal -->
+  <div class="modal fade" id="AddNewElementModal" tabindex="-1" role="dialog" aria-labelledby="AddNewElementModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-dark">
+          <h5 class="modal-title" id="AddNewElementModalTitle">Add New {{type}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        {% if type == "Part"%}
+          <form action="/parts/add" method="post">
+        {% endif %}
+
+        {% if type == "Operation"%}
+          <form action="/operations/add" method="post">
+        {% endif %}
+
+            <div class="modal-body bg-dark">
+                
+                    {% csrf_token %}
+                    {{ newElementForm }}
+
+            </div>
+            <div class="modal-footer bg-dark">
+            <input type="submit" class="btn btn-primary" value="Save changes"/>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<!-- End of Add new part trigger modal -->
+
+
+<table class="table-striped table-dark element_table">
+    <thead>
+    <tr>
+        <th scope="col">Image</th>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Code</th>
+        <th scope="col">Instock</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for element in elements %}
+      {% if type == "Part"%}
+        <tr onclick="window.location='/parts/{{element.id}}';" class="linkstyle">
+      {% endif %}
+
+      {% if type == "Operation"%}
+      <tr onclick="window.location='/operations/{{element.id}}';" class="linkstyle">
+      {% endif %}
+     
+          <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
+          <td>{{element.id}}</td>
+          <td>{{element.name}}</td>
+          <td>{{element.type}}</td>
+          <td>{{element.code}}</td>
+          <td>{{element.instock}}</td>
+      </tr>
+{% endfor %}
+</tbody>
+</table>
+
+
+
+{% endblock %}

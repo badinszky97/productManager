@@ -1,19 +1,25 @@
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import FileResponse
 from django.contrib.auth import authenticate, login, logout
-from .elements import get_all_parts
-from .elements import Part
+from .elements import get_all_elements
+from .elements import Element
+from .media import get_all_media
+from .media import Media
+import os.path
+
 
 from .forms import Loginform
-from .forms import NewPartForm
+from .forms import NewElementForm
+
+from .settings import PRODUCTMANAGER_VARIABLES
 
 
 def get_name(request):
 
     if request.user.is_authenticated:
         # Already logged in, redirect to the dashboard
-        print("1")
         return render(request, "dashboard.html")
     
     # if this is a POST request we need to process the form data
@@ -26,14 +32,11 @@ def get_name(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                print("2")
                 return render(request, "dashboard.html")
             else:
-                print("3")
                 return render(request, "index.html", {"form": form})
     else:
         form = Loginform()
-    print("4")
     return render(request, "index.html", {"form": form})
 
 def index(request):
@@ -41,22 +44,88 @@ def index(request):
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html')
 
+
+# **************************************************
+# Operations
+# **************************************************
+def operations_view(request):
+    all_parts = get_all_elements("Operation")
+    for item in all_parts:
+        print("****" + str(item))
+    newElementForm = NewElementForm()
+    # Render the HTML template index.html with the data in the context variable
+    return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : newElementForm, "type" : "Operation"})
+
+def operations_details_view(request, id):
+    if request.user.is_authenticated:
+        current_element = Element()
+        current_element.load_parameters_from_database(id)
+        return render(request, 'element_detail.html', {"element": current_element})
+    else:
+        return HttpResponseRedirect("/")
+    
+def operations_add_view(request):
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = NewElementForm(request.POST)
+            if form.is_valid():
+                newPart = Element(0, request.POST["name"], "Operation", request.POST["code"], 0)
+                newPart.createInDatabase()
+        return HttpResponseRedirect("/operations")
+    else:
+        return HttpResponseRedirect("/")
+
+# **************************************************
+# Parts
+# **************************************************
 def parts_view(request):
-    all_parts = get_all_parts()
+    all_parts = get_all_elements()
     for item in all_parts:
         print(str(item))
-    newPartForm = NewPartForm()
+    newElementForm = NewElementForm()
     # Render the HTML template index.html with the data in the context variable
-    return render(request, 'parts.html', {"parts": all_parts, "newPartForm" : newPartForm})
+    return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : newElementForm, "type" : "Part"})
+
+
+
+def parts_details_view(request, id):
+    if request.user.is_authenticated:
+        current_part = Element()
+        current_part.load_parameters_from_database(id)
+        return render(request, 'element_detail.html', {"element": current_part})
+    else:
+        return HttpResponseRedirect("/")
 
 def parts_add_view(request):
     if request.user.is_authenticated:
         if request.method == "POST":
-            form = NewPartForm(request.POST)
+            form = NewElementForm(request.POST)
             if form.is_valid():
-                newPart = Part(0, request.POST["name"], 0, request.POST["code"], 0)
+                newPart = Element(0, request.POST["name"], "Part", request.POST["code"], 0)
                 newPart.createInDatabase()
-    return HttpResponseRedirect("/parts")
+        return HttpResponseRedirect("/parts")
+    else:
+        return HttpResponseRedirect("/")
+
+    
+
+# **************************************************
+# Media
+# **************************************************
+def media_view(request):
+    if request.user.is_authenticated:
+        all_media = get_all_media()
+        return render(request, 'media.html', {"all_media": all_media})
+    else:
+        return HttpResponseRedirect("/")
+    
+def openMedia(request, path):
+    if(os.path.isfile(PRODUCTMANAGER_VARIABLES["media_path"] + "/" + path)):
+        img = open(PRODUCTMANAGER_VARIABLES["media_path"] + "/" + path, 'rb')
+        return FileResponse(img)
+    else:
+        img = open("./productManager/static/image.svg", 'rb')
+        return FileResponse(img)
 
 def logout_view(request):
     if request.user.is_authenticated == True:

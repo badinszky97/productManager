@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{element.code}} - {{element.name}}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row mt-5">
+      <div class="col-3">
+        <table class="table table-striped table-dark mt-3">
+            <tbody>
+              <tr>
+                <th scope="row">ID</th>
+                <td>{{element.id}}</td>
+              </tr>
+              <tr>
+                <th scope="row">Name</th>
+                <td>{{element.name}}</td>
+              </tr>
+              <tr>
+                <th scope="row">Type</th>
+                <td>{{element.type}}</td>
+              </tr>
+              <tr>
+                <th scope="row">Code</th>
+                <td>{{element.code}}</td>
+              </tr>
+              <tr>
+                <th scope="row">In Stock</th>
+                <td>{{element.instock}}</td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="col-6">
+        <img src ="/media/{{element.icon}}" id='element_icon'  alt="No image"/>
+      </div>
+      <div class="col">
+        3 of 3
+      </div>
+    </div>
+
+  </div>
+
+
+{% endblock %}

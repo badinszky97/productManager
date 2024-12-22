@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Media{% endblock %}
+
+{% block content %}
+
+<div class="media_container">
+
+{% for media in all_media %}
+
+<div class="card bg-dark text-white m-2" style="width: 18rem;">
+    <img class="card-img-top" src="/media/{{media.path}}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
+    
+{% endfor %}
+</div>
+
+{% endblock %}

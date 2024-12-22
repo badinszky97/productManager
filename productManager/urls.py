@@ -23,7 +23,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.get_name),
     path('parts/', views.parts_view),
+    path('parts/<int:id>', views.parts_details_view),
     path('parts/add', views.parts_add_view),
+
+    path('operations/', views.operations_view),
+    path('operations/<int:id>', views.operations_details_view),
+    path('operations/add', views.operations_add_view),
+
+
+    path('media/', views.media_view),
+    path('media/<str:path>', views.openMedia),
     path('logout/', views.logout_view, name='logout'),
 
     
