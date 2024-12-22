@@ -23,13 +23,24 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.get_name),
     path('parts/', views.parts_view),
-    path('parts/<int:id>', views.parts_details_view),
+    path('parts/<int:id>', views.element_details_view),
     path('parts/add', views.parts_add_view),
 
     path('operations/', views.operations_view),
-    path('operations/<int:id>', views.operations_details_view),
+    path('operations/<int:id>', views.element_details_view),
     path('operations/add', views.operations_add_view),
 
+    path('assemblies/', views.assemblies_view),
+    path('assemblies/<int:id>', views.element_details_view),
+    path('assemblies/add', views.assemblies_add_view),
+
+    path('products/', views.products_view),
+    path('products/<int:id>', views.element_details_view),
+    path('products/add', views.products_add_view),
+
+    path('projects/', views.projects_view),
+    path('projects/<int:id>', views.element_details_view),
+    path('projects/add', views.projects_add_view),
 
     path('media/', views.media_view),
     path('media/<str:path>', views.openMedia),

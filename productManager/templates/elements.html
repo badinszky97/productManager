@@ -28,6 +28,18 @@
           <form action="/operations/add" method="post">
         {% endif %}
 
+        {% if type == "Assembly"%}
+          <form action="/assemblies/add" method="post">
+        {% endif %}
+
+        {% if type == "Product"%}
+          <form action="/products/add" method="post">
+        {% endif %}
+
+        {% if type == "Project"%}
+          <form action="/projects/add" method="post">
+        {% endif %}
+
             <div class="modal-body bg-dark">
                 
                     {% csrf_token %}
@@ -63,6 +75,18 @@
 
       {% if type == "Operation"%}
       <tr onclick="window.location='/operations/{{element.id}}';" class="linkstyle">
+      {% endif %}
+
+      {% if type == "Assembly"%}
+      <tr onclick="window.location='/assemblies/{{element.id}}';" class="linkstyle">
+      {% endif %}
+
+      {% if type == "Product"%}
+      <tr onclick="window.location='/products/{{element.id}}';" class="linkstyle">
+      {% endif %}
+
+      {% if type == "Project"%}
+      <tr onclick="window.location='/projects/{{element.id}}';" class="linkstyle">
       {% endif %}
      
           <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
