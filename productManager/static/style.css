@@ -8,8 +8,7 @@ body{
 
 .container {
   margin-top:100px;
-    display: block;;
-    height: 100vh;
+    display: block;
     width: 100vw;
     max-width: 90vw !important;
 }
@@ -90,3 +89,21 @@ a:active {color:#FFFAFA;}
   padding-top:10px;
   padding-bottom:10px;
 }
+
+.tablabel
+{
+  padding: 10px;
+  background: #343a40;
+  border-radius: 10px 10px 0px 0px;
+  margin-right: 3px;
+}
+
+.tablabel:hover
+{
+  background:gray;
+}
+
+.tablabel a:link {color:#FFFAFA;}
+.tablabel a:visited {color:#FFFAFA;}
+.tablabel a:hover {color:#FFFAFA; text-decoration: none;}
+.tablabel a:active {color:#FFFAFA;}
