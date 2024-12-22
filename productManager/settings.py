@@ -82,6 +82,13 @@ DATABASES = {
         'PASSWORD': 'django',
         'HOST': '127.0.0.1',
         'PORT': '',
+    },
+    'product_manager':
+    {
+        'host' : "127.0.0.1",
+        'user' : "django",
+        'passwd' : "django",
+        'database' : "product_manager",
     }
 }
 

@@ -1,20 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Ez a title{% endblock %}
+{% block title %}Product Manager - Login{% endblock %}
 
 {% block content %}
-
-{% if user.is_authenticated %}
-  BE VAN LEPVE
-{% else %}
-  NINCS BELEPVE
-
-{% endif%}
-
-{% if user.is_authenticated %}
-<p>Welcome {{ user.username }} !!!</p>       
-{% endif %}
-
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
   <div class="card p-4" style="max-width: 400px; width: 100%; border-radius: 10px;">

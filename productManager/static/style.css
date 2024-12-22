@@ -1,16 +1,40 @@
 body{
 
-  background-color: #8EC5FC;
-  background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+  background-color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
 }
 
 .container {
     display: block;;
     height: 100vh;
-    width:100%;
+    width: 100vw;
 }
 
 .container > div {
   background-color: #343a40;
   color:white;
 }
+
+nav {
+  width:100vw;
+}
+
+h1 {
+  color: #333;
+}
+
+p {
+  line-height: 1.6;
+}
+
+.avatar_icon{
+  margin: auto;
+  display: block;
+}
+
+a:link {color:#FFFAFA;}
+a:visited {color:#FFFAFA;}
+a:hover {color:#FFFAFA;}
+a:active {color:#FFFAFA;}
