@@ -1,5 +1,4 @@
-from django.forms import CharField, Form, PasswordInput, TextInput
-
+from django.forms import CharField, Form, PasswordInput, TextInput, FileField
 
 class Loginform(Form):
     username = CharField(label="Username", max_length=100)
@@ -12,3 +11,7 @@ class NewElementForm(Form):
     name.widget = TextInput(attrs={'class': "form-control",})
     code = CharField(label="Code", max_length=10)
     code.widget = TextInput(attrs={'class': "form-control",})
+
+class UploadFileForm(Form):
+    title = CharField(max_length=50)
+    file = FileField()

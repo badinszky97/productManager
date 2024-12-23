@@ -1,13 +1,16 @@
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.http import FileResponse
 from django.contrib.auth import authenticate, login, logout
 from .elements import get_all_elements
 from .elements import Element
 from .media import get_all_media
 from .media import Media
+from .forms import UploadFileForm
 import os.path
+from django.core.files.storage import FileSystemStorage
+
 
 
 from .forms import Loginform
@@ -45,17 +48,34 @@ def index(request):
 # **************************************************
 # Elements
 # **************************************************
+
+def handle_uploaded_file(f):  
+    with open('/home/bady/Documents/ujfilee', 'wb+') as destination:  
+        for chunk in f.chunks():  
+            destination.write(chunk)  
+
+
 def element_details_view(request, id):
     if request.user.is_authenticated:
+        if request.method == "POST":
+            form = UploadFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                handle_uploaded_file(request.FILES["file"])
+                return HttpResponseRedirect("/")
+
         current_element = Element()
         current_element.load_parameters_from_database(id)
-        return render(request, 'element_detail.html', {"element": current_element})
+
+
+        return render(request, 'element_detail.html', {"element": current_element, "newFileForm" : UploadFileForm()})
     else:
         return HttpResponseRedirect("/")
+    
+
 
 def element_add(request, type, url):
     if request.user.is_authenticated:
-        if request.method == "POST":
+        if request.method == "POST":    
             form = NewElementForm(request.POST)
             if form.is_valid():
                 newPart = Element(0, request.POST["name"], type, request.POST["code"], 0)
@@ -72,7 +92,7 @@ def operations_view(request):
     return render(request, 'elements.html', {"elements": all_operations, "newElementForm" : NewElementForm(), "type" : "Operation"})
 
 def operations_add_view(request):
-    element_add(request, "Operation", "/operations")
+    return element_add(request, "Operation", "/operations")
 
 # **************************************************
 # Parts
@@ -82,7 +102,7 @@ def parts_view(request):
     return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : NewElementForm(), "type" : "Part"})
 
 def parts_add_view(request):
-    element_add(request, "Part", "/parts")
+    return element_add(request, "Part", "/parts")
 
 # **************************************************
 # Assemblies
@@ -92,7 +112,7 @@ def assemblies_view(request):
     return render(request, 'elements.html', {"elements": all_assemblies, "newElementForm" : NewElementForm(), "type" : "Assembly"})
 
 def assemblies_add_view(request):
-    element_add(request, "Assembly", "/assemblies")
+    return element_add(request, "Assembly", "/assemblies")
 
 # **************************************************
 # Products
@@ -103,7 +123,7 @@ def products_view(request):
 
 def products_add_view(request):
     if request.user.is_authenticated:
-        element_add(request, "Product", "/products")
+        return element_add(request, "Product", "/products")
     
 # **************************************************
 # Projects
@@ -113,7 +133,7 @@ def projects_view(request):
     return render(request, 'elements.html', {"elements": all_projects, "newElementForm" : NewElementForm(), "type" : "Project"})
 
 def projects_add_view(request):
-    element_add(request, "Project", "/projects")
+    return element_add(request, "Project", "/projects")
 
 # **************************************************
 # Media

@@ -29,7 +29,7 @@ urlpatterns = [
     path('operations/', views.operations_view),
     path('operations/<int:id>', views.element_details_view),
     path('operations/add', views.operations_add_view),
-
+    
     path('assemblies/', views.assemblies_view),
     path('assemblies/<int:id>', views.element_details_view),
     path('assemblies/add', views.assemblies_add_view),

@@ -60,6 +60,17 @@
 <div class="tab-content">
   <div id="media" class="tab-pane fade active show">
     Media
+    
+    <form action="#" method="post" enctype="multipart/form-data">
+
+      <div class="modal-body bg-dark">
+              {% csrf_token %}
+              {{ newFileForm }}
+              <input type="hidden" name="formType" value="uploadForm">
+      <input type="submit" class="btn btn-primary float-none" value="Upload"/>
+      </div>
+  </form>
+
   </div>
   <div id="order" class="tab-pane fade">
     Order
