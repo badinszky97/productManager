@@ -8,7 +8,7 @@ from .elements import Element
 from .media import get_all_media
 from .media import Media
 from .forms import UploadFileForm
-import os.path
+import os.path, random, string
 from django.core.files.storage import FileSystemStorage
 
 
@@ -49,10 +49,17 @@ def index(request):
 # Elements
 # **************************************************
 
-def handle_uploaded_file(f):  
-    with open('/home/bady/Documents/ujfilee', 'wb+') as destination:  
+def handle_uploaded_file(f, id, description):  
+    # printing lowercase
+    characters = string.ascii_letters
+    filename = ''.join(random.choice(characters) for i in range(10)) + "." + f.name.split('.')[-1]
+
+    with open(PRODUCTMANAGER_VARIABLES["media_path"] + "/" + filename, 'wb+') as destination:  
         for chunk in f.chunks():  
             destination.write(chunk)  
+    newMedia = Media(filename, description)
+    newMedia.createInDatabase()
+    newMedia.attachFileToElement(id)
 
 
 def element_details_view(request, id):
@@ -60,8 +67,8 @@ def element_details_view(request, id):
         if request.method == "POST":
             form = UploadFileForm(request.POST, request.FILES)
             if form.is_valid():
-                handle_uploaded_file(request.FILES["file"])
-                return HttpResponseRedirect("/")
+                handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
+                #return HttpResponseRedirect("/")
 
         current_element = Element()
         current_element.load_parameters_from_database(id)

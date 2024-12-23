@@ -13,5 +13,6 @@ class NewElementForm(Form):
     code.widget = TextInput(attrs={'class': "form-control",})
 
 class UploadFileForm(Form):
-    title = CharField(max_length=50)
+    description = CharField(label="Description", max_length=40)
+    description.widget = TextInput(attrs={'class': "form-control",})
     file = FileField()
