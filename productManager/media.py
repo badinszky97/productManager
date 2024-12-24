@@ -8,8 +8,9 @@ class Media():
         self.id = -1
         self.path = path
         self.description = Description
+        self.is_image = self.path.split(".")[-1] in ["jpg", "png", "webp"]
     def __str__(self):
-        return f"ID: {self.id}, Path: {self.path}, Description: {self.description}"
+        return f"ID: {self.id}, Path: {self.path}, Description: {self.description}, is_image: {self.is_image}"
     
     def load_parameters_from_database(self, id):
         conn = get_database_connection()

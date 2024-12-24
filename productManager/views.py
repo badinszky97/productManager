@@ -99,7 +99,7 @@ def operations_view(request):
 # **************************************************
 # Parts
 # **************************************************
-def parts_view(request, type):
+def parts_view(request):
     all_parts = get_all_elements("Part")
     return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : NewElementForm(), "type" : "Part"})
 

@@ -22,7 +22,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.get_name),
-    path('parts/', views.parts_view, {"type" : "nulla"}),
+    path('parts/', views.parts_view),
     path('parts/<int:id>', views.element_details_view),
     path('parts/add', views.element_add, {"type" : "Part", "url" : "/parts"}),
 

@@ -1,4 +1,5 @@
 from .settings import get_database_connection
+from .media import Media
 
 
 class Element():
@@ -10,6 +11,7 @@ class Element():
         self.code = code
         self.instock = instock
         self.icon = icon
+        self.mediaList = []
     def __str__(self):
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
@@ -22,7 +24,15 @@ class Element():
             result = cur.fetchone() 
             if(cur.rowcount > 0):
                 self.__init__(result[0], result[1], result[2], result[3], result[4], result[5])
-            print(self)
+
+            cur.execute(f"SELECT f.path, f.description FROM files as f, file_connects as fc, elements as e WHERE fc.file_id=f.id and e.id = fc.element_id and e.id={self.id}")
+            for (path, description) in cur:
+                current_element = Media(path, description)
+                self.mediaList.append(current_element)
+                print("UJ file: " + str(current_element))
+            
+
+
 
     def createInDatabase(self):
         conn = get_database_connection()
