@@ -68,11 +68,9 @@ def element_details_view(request, id):
             form = UploadFileForm(request.POST, request.FILES)
             if form.is_valid():
                 handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
-                #return HttpResponseRedirect("/")
 
         current_element = Element()
         current_element.load_parameters_from_database(id)
-
 
         return render(request, 'element_detail.html', {"element": current_element, "newFileForm" : UploadFileForm()})
     else:
@@ -98,18 +96,12 @@ def operations_view(request):
     all_operations = get_all_elements("Operation")
     return render(request, 'elements.html', {"elements": all_operations, "newElementForm" : NewElementForm(), "type" : "Operation"})
 
-def operations_add_view(request):
-    return element_add(request, "Operation", "/operations")
-
 # **************************************************
 # Parts
 # **************************************************
-def parts_view(request):
+def parts_view(request, type):
     all_parts = get_all_elements("Part")
     return render(request, 'elements.html', {"elements": all_parts, "newElementForm" : NewElementForm(), "type" : "Part"})
-
-def parts_add_view(request):
-    return element_add(request, "Part", "/parts")
 
 # **************************************************
 # Assemblies
@@ -118,19 +110,12 @@ def assemblies_view(request):
     all_assemblies = get_all_elements("Assembly")
     return render(request, 'elements.html', {"elements": all_assemblies, "newElementForm" : NewElementForm(), "type" : "Assembly"})
 
-def assemblies_add_view(request):
-    return element_add(request, "Assembly", "/assemblies")
-
 # **************************************************
 # Products
 # **************************************************
 def products_view(request):
     all_products = get_all_elements("Product")
     return render(request, 'elements.html', {"elements": all_products, "newElementForm" : NewElementForm(), "type" : "Product"})
-
-def products_add_view(request):
-    if request.user.is_authenticated:
-        return element_add(request, "Product", "/products")
     
 # **************************************************
 # Projects
@@ -138,9 +123,6 @@ def products_add_view(request):
 def projects_view(request):
     all_projects = get_all_elements("Project")
     return render(request, 'elements.html', {"elements": all_projects, "newElementForm" : NewElementForm(), "type" : "Project"})
-
-def projects_add_view(request):
-    return element_add(request, "Project", "/projects")
 
 # **************************************************
 # Media
