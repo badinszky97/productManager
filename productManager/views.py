@@ -72,7 +72,9 @@ def element_details_view(request, id):
         current_element = Element()
         current_element.load_parameters_from_database(id)
 
-        return render(request, 'element_detail.html', {"element": current_element, "newFileForm" : UploadFileForm()})
+        
+
+        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "newFileForm" : UploadFileForm()})
     else:
         return HttpResponseRedirect("/")
     
@@ -141,6 +143,12 @@ def openMedia(request, path):
     else:
         img = open("./productManager/static/image.svg", 'rb')
         return FileResponse(img)
+
+def modify_icon(self, element_id, media_path):
+    part = Element()
+    part.load_parameters_from_database(element_id)
+    part.change_icon(media_path)
+    return HttpResponseRedirect(f"/elements/{element_id}")
 
 def logout_view(request):
     if request.user.is_authenticated == True:

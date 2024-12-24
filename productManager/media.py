@@ -51,8 +51,8 @@ def get_all_media():
             cur = conn.cursor()
             cur.execute("SELECT * FROM files")
             all_meida = []
-            for (ID, path, Description) in cur:
-                current_media = Media(ID, path, Description)
+            for (id, path, Description) in cur:
+                current_media = Media(path, Description)
                 all_meida.append(current_media)
             return all_meida
         else:

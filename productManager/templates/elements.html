@@ -68,31 +68,13 @@
     </thead>
     <tbody>
 {% for element in elements %}
-      {% if type == "Part"%}
-        <tr onclick="window.location='/parts/{{element.id}}';" class="linkstyle">
-
-      {% elif type == "Operation"%}
-        <tr onclick="window.location='/operations/{{element.id}}';" class="linkstyle">
-
-      {% elif type == "Assembly"%}
-        <tr onclick="window.location='/assemblies/{{element.id}}';" class="linkstyle">
-
-      {% elif type == "Product"%}
-        <tr onclick="window.location='/products/{{element.id}}';" class="linkstyle">
-
-      {% elif type == "Project"%}
-        <tr onclick="window.location='/projects/{{element.id}}';" class="linkstyle">
-
-      {% else %}
-        <tr class="linkstyle">
-      {% endif %}
-     
-          <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
-          <td>{{element.id}}</td>
-          <td>{{element.name}}</td>
-          <td>{{element.type}}</td>
-          <td>{{element.code}}</td>
-          <td>{{element.instock}}</td>
+        <tr onclick="window.location='/elements/{{element.id}}';" class="linkstyle">
+        <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
+        <td>{{element.id}}</td>
+        <td>{{element.name}}</td>
+        <td>{{element.type}}</td>
+        <td>{{element.code}}</td>
+        <td>{{element.instock}}</td>
       </tr>
 {% endfor %}
 </tbody>

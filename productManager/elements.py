@@ -31,7 +31,14 @@ class Element():
                 self.mediaList.append(current_element)
                 print("UJ file: " + str(current_element))
             
-
+    def change_icon(self, icon_path):
+        conn = get_database_connection()
+        if conn != None:
+            cur = conn.cursor()
+            print(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
+            cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
+            conn.commit()
+            conn.close() 
 
 
     def createInDatabase(self):

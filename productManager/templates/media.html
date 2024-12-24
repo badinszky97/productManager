@@ -9,10 +9,15 @@
 {% for media in all_media %}
 
 <div class="card bg-dark text-white m-2" style="width: 18rem;">
+  {% if media.is_image %}
     <img class="card-img-top" src="/media/{{media.path}}" alt="Media Card">
+  {% else %}
+    {% load static %}
+    <img class="card-img-top" src="{% static 'document.svg' %}" alt="Media Card">
+  {% endif %}
     <div class="card-body">
-      <h4 class="card-title">Media</h4>
-      <a href="#" class="btn btn-primary">details</a>
+      <h4 class="card-title">{{media.description}}</h4>
+      <a href="/media/{{media.path}}" target="_blank" class="btn btn-primary">Download</a>
     </div>
   </div>
     
