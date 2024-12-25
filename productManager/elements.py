@@ -30,15 +30,12 @@ class Element():
             for (path, description) in cur:
                 current_element = Media(path, description)
                 self.mediaList.append(current_element)
-                print("UJ file: " + str(current_element))
             
     def change_icon(self, icon_path):
         if self.conn != None:
             cur = self.conn.cursor()
-            print(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
             cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
             self.conn.commit()
-            self.conn.close() 
 
 
     def createInDatabase(self):
@@ -48,7 +45,6 @@ class Element():
             query = f"INSERT INTO elements (Name, Type, Code) VALUES ('{self.name}', (SELECT ID FROM element_types WHERE description=\'{self.type}\'), '{self.code}')"
             cur.execute(query)
             self.conn.commit()
-            self.conn.close() 
     
     def delete(self):
         self.conn = get_database_connection()
@@ -57,21 +53,18 @@ class Element():
             query = f"DELETE FROM elements WHERE id={self.id}"
             cur.execute(query)
             self.conn.commit()
-            self.conn.close() 
  
 
 def get_all_elements(type="Part"):
         conn = get_database_connection()
         if conn != None:
             cur = conn.cursor()
-            print(f"SELECT * FROM elements WHERE type=(SELECT ID FROM element_types WHERE description='{type}')")
             cur.execute(f"SELECT * FROM elements WHERE type=(SELECT ID FROM element_types WHERE description='{type}')")
             all_elements = []
             for (id, name, type, code, instock, icon) in cur:
                 current_element = Element(id, name, type, code, instock, icon)
                 current_element.load_parameters_from_database(id)
                 all_elements.append(current_element)
-            print(str(all_elements))
             return all_elements
         else:
              return []

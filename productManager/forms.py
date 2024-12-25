@@ -16,3 +16,9 @@ class UploadFileForm(Form):
     description = CharField(label="Description", max_length=40)
     description.widget = TextInput(attrs={'class': "form-control",})
     file = FileField()
+
+class NewVendorForm(Form):
+    company = CharField(label="Company name", max_length=20)
+    company.widget = TextInput(attrs={'class': "form-control",})
+    address = CharField(label="Address", max_length=100)
+    address.widget = TextInput(attrs={'class': "form-control",})

@@ -44,6 +44,11 @@ urlpatterns = [
     path('media/', views.media_view),
     path('media/delete/<int:id>', views.media_delete),
     path('media/<str:path>', views.openMedia),
+
+    path('vendors/', views.vendors_view),
+    path('vendors/add', views.vendor_add),
+    path('vendors/delete/<int:id>', views.vendor_delete),
+
     path('logout/', views.logout_view, name='logout'),
 
     

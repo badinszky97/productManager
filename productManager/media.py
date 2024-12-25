@@ -29,7 +29,6 @@ class Media():
             cur.execute(query)
             self.conn.commit()
             self.id = cur.lastrowid
-            self.conn.close() 
     
     def attachFileToElement(self, id):
         if self.conn != None:
@@ -38,7 +37,6 @@ class Media():
             query = f"INSERT INTO file_connects (file_id, element_id) VALUES ('{self.id}', '{id}')"
             cur.execute(query)
             self.conn.commit()
-            self.conn.close() 
 
     def delete(self):
         import os
@@ -49,7 +47,6 @@ class Media():
             print(str(query))
             cur.execute(query)
             self.conn.commit()
-            self.conn.close() 
             os.remove(f"{PRODUCTMANAGER_VARIABLES["media_path"]}/{self.path}")
 
 

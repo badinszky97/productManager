@@ -1,0 +1,22 @@
+<div id="icon" class="tab-pane fade">
+    <h3 class="pt-4">Set Icon</h3>
+
+
+    <div class="media_container">
+    {% for media in all_media %}
+    
+    {% if media.is_image %}
+
+    <div class="card bg-light text-dark m-2 rounded" style="width: 14rem;">
+        <img class="card-img-top" src="/media/{{media.path}}" alt="Media Card">
+        <div class="card-body">
+          <h4 class="card-title">{{media.description}}</h4>
+            <a href="/elements/modify_icon/{{element.id}}/{{media.path}}" class="btn btn-primary mt-2">Set as icon</a>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+    </div>
+
+
+  </div>

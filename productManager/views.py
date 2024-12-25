@@ -7,7 +7,10 @@ from .elements import get_all_elements
 from .elements import Element
 from .media import get_all_media
 from .media import Media
+from .vendor import get_all_vendors
 from .forms import UploadFileForm
+from .forms import NewVendorForm
+from .vendor import Vendor
 import os.path, random, string
 from django.core.files.storage import FileSystemStorage
 
@@ -173,6 +176,35 @@ def modify_icon(self, element_id, media_path):
     part.load_parameters_from_database(element_id)
     part.change_icon(media_path)
     return HttpResponseRedirect(f"/elements/{element_id}")
+
+
+# **************************************************
+# Vendors
+# **************************************************
+def vendors_view(request):
+    return render(request, 'vendors.html', {"vendors": get_all_vendors(), "newVendorForm" : NewVendorForm()})
+
+def vendor_add(request):
+    if request.user.is_authenticated:
+        if request.method == "POST":    
+            form = NewVendorForm(request.POST)
+            if form.is_valid():
+                newVendor = Vendor(0,request.POST["company"], request.POST["address"])
+                newVendor.createInDatabase()
+        return HttpResponseRedirect("/vendors")
+    else:
+        return HttpResponseRedirect("/")
+    
+def vendor_delete(request, id):
+    if request.user.is_authenticated:
+        current_vendor = Vendor(0,"","")
+        current_vendor.load_parameters_from_database(id)
+        current_vendor.delete()
+        
+
+        return HttpResponseRedirect("/vendors")
+    else:
+        return HttpResponseRedirect("/")
 
 def logout_view(request):
     if request.user.is_authenticated == True:
