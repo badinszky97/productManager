@@ -21,6 +21,7 @@ class Element():
     def load_parameters_from_database(self, part_id):
         if self.conn != None:
             cur = self.conn.cursor()
+            
             cur.execute(f"SELECT e.id, e.name, t.description, e.code, e.instock, IF(e.icon is null, null, f.path) as icon FROM elements as e, files as f, element_types as t WHERE e.ID={part_id} and  e.type=t.id and (e.icon=f.id or e.icon is null) LIMIT 1;")
             
             result = cur.fetchone() 
@@ -42,6 +43,7 @@ class Element():
             cur = self.conn.cursor()
             cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
             self.conn.commit()
+            self.load_parameters_from_database(self.id)
 
 
     def createInDatabase(self):
@@ -59,12 +61,13 @@ class Element():
             cur.execute(query)
             self.conn.commit()
 
-    def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, link, code):
+    def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, code, link):
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, link, unit, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
             cur.execute(query)
             self.conn.commit()
+            self.load_parameters_from_database(self.id)
         
     def delete_purchase_opportunity(self, opportunityID):
          if self.conn != None:
@@ -73,6 +76,7 @@ class Element():
             print(query)
             cur.execute(query)
             self.conn.commit()       
+            self.load_parameters_from_database(self.id)
  
 
 def get_all_elements(type="Part"):

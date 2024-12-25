@@ -67,6 +67,7 @@ def handle_uploaded_file(f, id, description):
 
 
 def element_details_view(request, id):
+    print("get code: " + str(id))
     if request.user.is_authenticated:
         vendors = get_all_vendors()
         active_modal_vendor = False
@@ -85,16 +86,18 @@ def element_details_view(request, id):
                                                          request.POST["price_unit"],
                                                          request.POST["price"],
                                                          request.POST["unit"],
-                                                         request.POST["link"],
-                                                         request.POST["code"]
+                                                         request.POST["code"],
+                                                         request.POST["link"]
                                                          )
+
+
+                current_element.load_parameters_from_database(id)
             elif(request.POST["formType"] == "vendorDelete"):
                 current_element.delete_purchase_opportunity(request.POST["orderID"])
+                current_element.load_parameters_from_database(id)          
 
-            current_element.load_parameters_from_database(id)          
-
-
-        return render(request, 'element_detail.html', {"element": current_element, "all_media" : vendors, "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "price_units" : get_all_price_units()})
+        print(str(current_element))
+        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "price_units" : get_all_price_units()})
     else:
         return HttpResponseRedirect("/")
     
