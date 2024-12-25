@@ -24,6 +24,7 @@ urlpatterns = [
     path('', views.get_name),
     path('parts/', views.parts_view),
     path('elements/<int:id>', views.element_details_view),
+    path('elements/delete/<int:id>', views.element_delete),
     path('elements/modify_icon/<int:element_id>/<str:media_path>', views.modify_icon),
 
     path('parts/add', views.element_add, {"type" : "Part", "url" : "/parts"}),
@@ -41,6 +42,7 @@ urlpatterns = [
     path('projects/add', views.element_add, {"type" : "Project", "url" : "/projects"}),
 
     path('media/', views.media_view),
+    path('media/delete/<int:id>', views.media_delete),
     path('media/<str:path>', views.openMedia),
     path('logout/', views.logout_view, name='logout'),
 

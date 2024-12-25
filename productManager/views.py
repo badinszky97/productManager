@@ -78,7 +78,21 @@ def element_details_view(request, id):
     else:
         return HttpResponseRedirect("/")
     
+def element_delete(request, id):
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = UploadFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
 
+        current_element = Element()
+        current_element.load_parameters_from_database(id)
+        current_element.delete()
+        
+
+        return HttpResponseRedirect("/")
+    else:
+        return HttpResponseRedirect("/")
 
 def element_add(request, type, url):
     if request.user.is_authenticated:
@@ -133,6 +147,16 @@ def media_view(request):
     if request.user.is_authenticated:
         all_media = get_all_media()
         return render(request, 'media.html', {"all_media": all_media})
+    else:
+        return HttpResponseRedirect("/")
+    
+def media_delete(request, id):
+    if request.user.is_authenticated:
+        current_element = Media("-","-")
+        current_element.load_parameters_from_database(id)
+        current_element.delete()
+
+        return HttpResponseRedirect("/media")
     else:
         return HttpResponseRedirect("/")
     

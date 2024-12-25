@@ -13,14 +13,42 @@
     <img class="card-img-top" src="/media/{{media.path}}" alt="Media Card">
   {% else %}
     {% load static %}
-    <img class="card-img-top" src="{% static 'document.svg' %}" alt="Media Card">
+    <img class="card-img-top" src="{% static 'document.svg' %}" style="height:150px;" alt="Media Card">
   {% endif %}
     <div class="card-body">
       <h4 class="card-title">{{media.description}}</h4>
-      <a href="/media/{{media.path}}" target="_blank" class="btn btn-primary">Download</a>
+      <h6>References: {{media.references}}</h6>
+      <a href="/media/{{media.path}}" target="_blank" class="btn btn-primary">Download</a><br>
+      <!-- Button trigger delete modal -->
+      <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#deleteelement{{forloop.counter}}">
+        Delete
+      </button>
     </div>
   </div>
     
+
+<!-- Delete element Modal -->
+<div class="modal fade" id="deleteelement{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="deleteelementlabel{{forloop.counter}}" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteelementlabel{{forloop.counter}}">Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <a href="/media/delete/{{media.id}}" class="btn btn-danger mt-2">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 {% endfor %}
 </div>
 

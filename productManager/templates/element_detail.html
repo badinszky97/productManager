@@ -47,7 +47,15 @@
         <img src ="/media/{{element.icon}}" id='element_icon'  alt="No image"/>
       </div>
       <div class="col">
-        3 of 3
+      
+
+        <!-- Button trigger delete modal -->
+        <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#deleteelement" style="width:300px;">
+          Delete {{element.type}}
+        </button>
+
+
+
       </div>
     </div>
 
@@ -88,12 +96,12 @@
   <div class="media_container">
     {% for media in element.mediaList %}
     
-    <div class="card bg-dark text-white m-2 rounded" style="width: 14rem;">
+    <div class="card bg-light text-dark m-2 rounded" style="width: 14rem;">
         {% if media.is_image %}
           <img class="card-img-top" src="/media/{{media.path}}" alt="Media Card">
         {% else %}
           {% load static %}
-          <img class="card-img-top" src="{% static 'document.svg' %}" alt="Media Card">
+          <img class="card-img-top" src="{% static 'document.svg' %}" style="height:150px;" alt="Media Card">
         {% endif %}
         <div class="card-body">
           <h4 class="card-title">{{media.description}}</h4>
@@ -109,7 +117,7 @@
 
   </div>
   <div id="icon" class="tab-pane fade">
-    Set Icon
+    <h3 class="pt-4">Set Icon</h3>
 
 
     <div class="media_container">
@@ -117,11 +125,10 @@
     
     {% if media.is_image %}
 
-    <div class="card bg-dark text-white m-2 rounded" style="width: 14rem;">
+    <div class="card bg-light text-dark m-2 rounded" style="width: 14rem;">
         <img class="card-img-top" src="/media/{{media.path}}" alt="Media Card">
         <div class="card-body">
           <h4 class="card-title">{{media.description}}</h4>
-          <a href="/media/{{media.path}}" target="_blank" class="btn btn-primary">Download</a>
             <a href="/elements/modify_icon/{{element.id}}/{{media.path}}" class="btn btn-primary mt-2">Set as icon</a>
         </div>
       </div>
@@ -132,5 +139,26 @@
 
   </div>
 
+
+
+<!-- Delete element Modal -->
+<div class="modal fade" id="deleteelement" tabindex="-1" role="dialog" aria-labelledby="deleteelementlabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteelementlabel">Delete {{element.type}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <a href="/elements/delete/{{element.id}}" class="btn btn-danger mt-2">Delete {{element.type}}</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

@@ -12,13 +12,14 @@ class Element():
         self.instock = instock
         self.icon = icon
         self.mediaList = []
+
+        self.conn = get_database_connection()
     def __str__(self):
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
     def load_parameters_from_database(self, part_id):
-        conn = get_database_connection()
-        if conn != None:
-            cur = conn.cursor()
+        if self.conn != None:
+            cur = self.conn.cursor()
             cur.execute(f"SELECT e.id, e.name, t.description, e.code, e.instock, IF(e.icon is null, null, f.path) as icon FROM elements as e, files as f, element_types as t WHERE e.ID={part_id} and  e.type=t.id and (e.icon=f.id or e.icon is null) LIMIT 1;")
             
             result = cur.fetchone() 
@@ -32,28 +33,32 @@ class Element():
                 print("UJ file: " + str(current_element))
             
     def change_icon(self, icon_path):
-        conn = get_database_connection()
-        if conn != None:
-            cur = conn.cursor()
+        if self.conn != None:
+            cur = self.conn.cursor()
             print(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
             cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
-            conn.commit()
-            conn.close() 
+            self.conn.commit()
+            self.conn.close() 
 
 
     def createInDatabase(self):
-        conn = get_database_connection()
-        if conn != None:
-            cur = conn.cursor()
+        if self.conn != None:
+            cur = self.conn.cursor()
             
             query = f"INSERT INTO elements (Name, Type, Code) VALUES ('{self.name}', (SELECT ID FROM element_types WHERE description=\'{self.type}\'), '{self.code}')"
-            print(query)
             cur.execute(query)
-            conn.commit()
-            conn.close() 
+            self.conn.commit()
+            self.conn.close() 
+    
+    def delete(self):
+        self.conn = get_database_connection()
+        if self.conn != None:
+            cur = self.conn.cursor()           
+            query = f"DELETE FROM elements WHERE id={self.id}"
+            cur.execute(query)
+            self.conn.commit()
+            self.conn.close() 
  
-            print("Hozzáadva")
-
 
 def get_all_elements(type="Part"):
         conn = get_database_connection()

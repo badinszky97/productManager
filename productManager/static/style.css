@@ -64,8 +64,10 @@ a:active {color:#FFFAFA;}
 
 #element_icon
 {
-  margin-top:10px;
-  width:10vw;
+  display: block;
+  margin:auto;
+  justify-content: center;
+  height:200px;
 }
 
 .table_icon{
