@@ -64,7 +64,7 @@
 <ul class="nav nav-tabs mt-5">
   <li class="tablabel"><a href="#media">Media</a></li>
   <li class="tablabel"><a href="#icon">Set Icon</a></li>
-  <li class="tablabel"><a href="#vendors">Vendors</a></li>
+  <li class="tablabel"><a href="#vendors">Purchase possibilities</a></li>
 </ul>
 <div class="tab-content">
 
@@ -92,5 +92,101 @@
     </div>
   </div>
 </div>
+
+
+{% if active_modal_vendor %}
+  <script type="text/javascript">
+    $(window).on('load', function() {
+        $('.add-vendor-form').modal('show');
+    });
+  </script>
+{% endif %}
+
+
+<!-- Vendor add modal -->
+{% if active_modal_vendor %}
+    <div class="modal fade add-vendor-form" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+{% else %}
+    <div class="modal fade add-vendor-form" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="false">
+{% endif %}
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark">
+        
+        <!-- Filter -->
+        <form action="#" method="post">    
+            <div class="modal-body bg-dark">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                Filter:
+
+                {% csrf_token %}
+                <table class="ml-auto mr-auto">
+                    <tr>
+                        <td>Company</td>
+                        <td><input type=text name="company"></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td><input type=text name="address"></td>
+                    </tr>
+                    <tr>
+                        <td colspan=2><input type="submit" class="btn btn-primary mt-2 w-100" value="Filter"/></td>
+                    </tr>
+                </table>
+                                         
+            </div>
+            <input type="hidden" name="formType" value="vendorFilter">
+        </form>
+        <!-- End of filter -->
+
+        <table>
+        <thead>
+            <tr>
+                <th scope="col">Company</th>
+                <th scope="col">Price Unit</th>
+                <th scope="col">Price</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Code</th>
+                <th scope="col">Link</th>
+                <th scope="col">Add</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for vendor in vendors %}
+                    <tr>
+                    <td>{{vendor.company}}</td>
+                    <td>
+                      <form action="#" method="post">
+                        {% csrf_token %}
+                        <select name="price_unit" id="p_unit">
+                        {% for unit in price_units %}
+                          <option value="{{unit.id}}">{{unit.unittype}}</option>
+                        {% endfor %}
+                      </select>
+                        
+                      </td>
+                      <td><input type=number name="price" required min=0 style="width:80px;" required></td>
+                      <td><input type=text name="unit" required style="width:80px;"></td>
+                      <td><input type=text name="code" required maxlength=20 style="width:100px;"></td>
+                      <td><input type=text name="link" style="width:80px;"></td>
+                      <td><input type="submit" class="btn btn-success" value="Add"></td>
+
+                      <input type="hidden" name="formType" value="addVendor">
+                      <input type="hidden" name="vendorID" value="{{vendor.id}}">
+                      <input type="hidden" name="elementID" value="{{element.id}}">
+
+                    </form>
+                    </tr>
+                {% endfor %}
+        </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+
+
 
 {% endblock %}

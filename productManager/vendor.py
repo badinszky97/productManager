@@ -35,17 +35,50 @@ class Vendor():
             print(str(query))
             cur.execute(query)
             self.conn.commit()
+       
+def get_all_vendors(company="", address=""):
+    conn = get_database_connection()
+    if conn != None:
+        cur = conn.cursor()
+        query = ""
 
-def get_all_vendors():
-        conn = get_database_connection()
-        if conn != None:
-            cur = conn.cursor()
-            query = "SELECT * FROM vendors"
+        if(company == "" and address == ""):
+            query = f"SELECT * FROM vendors"
+        elif(company != "" and address == ""):
+            query = f"SELECT * FROM vendors WHERE company LIKE CONCAT('%', UPPER('{company}'), '%')"
+        elif(company == "" and address != ""):
+            query = f"SELECT * FROM vendors WHERE address LIKE CONCAT('%', UPPER('{address}'), '%')"
+        elif(company != "" and address != ""):
+            query = f"SELECT * FROM vendors WHERE company LIKE CONCAT('%', UPPER('{company}'), '%') and address LIKE CONCAT('%', UPPER('{address}'), '%')"
 
-            cur.execute(query)
-            all_vendors = []
-            for (id, company, address) in cur:
-                all_vendors.append(Vendor(id, company, address))
-            return all_vendors
-        else:
-             return []
+        cur.execute(query)
+        all_vendors = []
+        print(str(query))
+        for (id, company, address) in cur:
+            all_vendors.append(Vendor(id, company, address))
+        return all_vendors
+    else:
+            return []
+    
+class PriceUnits():
+    def __init__(self, id, unittype, shortterm):
+        """ Create element from scratch"""
+        self.id = id
+        self.unittype = unittype
+        self.shortterm = shortterm
+    def __str__(self):
+        return f"ID: {self.id}, UnitType: {self.unittype}, ShortTerm: {self.shortterm}"
+
+def get_all_price_units():
+    conn = get_database_connection()
+    if conn != None:
+        cur = conn.cursor()
+        query = f"SELECT * FROM price_units"
+        cur.execute(query)
+        all_price_units = []
+        print(str(query))
+        for (id, unittype, shortterm) in cur:
+            all_price_units.append(PriceUnits(id, unittype, shortterm))
+        return all_price_units
+    else:
+            return []

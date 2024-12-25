@@ -12,6 +12,7 @@ class Element():
         self.instock = instock
         self.icon = icon
         self.mediaList = []
+        self.purchaseOpportunities = []
 
         self.conn = get_database_connection()
     def __str__(self):
@@ -30,6 +31,11 @@ class Element():
             for (path, description) in cur:
                 current_element = Media(path, description)
                 self.mediaList.append(current_element)
+
+            cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
+
+            for (id, company, price, priceunit, link, unit, code) in cur:
+                self.purchaseOpportunities.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
             
     def change_icon(self, icon_path):
         if self.conn != None:
@@ -47,12 +53,26 @@ class Element():
             self.conn.commit()
     
     def delete(self):
-        self.conn = get_database_connection()
         if self.conn != None:
             cur = self.conn.cursor()           
             query = f"DELETE FROM elements WHERE id={self.id}"
             cur.execute(query)
             self.conn.commit()
+
+    def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, link, code):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, link, unit, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
+            cur.execute(query)
+            self.conn.commit()
+        
+    def delete_purchase_opportunity(self, opportunityID):
+         if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"DELETE FROM orderable WHERE id={opportunityID}"
+            print(query)
+            cur.execute(query)
+            self.conn.commit()       
  
 
 def get_all_elements(type="Part"):

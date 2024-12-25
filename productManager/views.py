@@ -11,6 +11,7 @@ from .vendor import get_all_vendors
 from .forms import UploadFileForm
 from .forms import NewVendorForm
 from .vendor import Vendor
+from .vendor import get_all_price_units
 import os.path, random, string
 from django.core.files.storage import FileSystemStorage
 
@@ -67,17 +68,33 @@ def handle_uploaded_file(f, id, description):
 
 def element_details_view(request, id):
     if request.user.is_authenticated:
-        if request.method == "POST":
-            form = UploadFileForm(request.POST, request.FILES)
-            if form.is_valid():
-                handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
-
+        vendors = get_all_vendors()
+        active_modal_vendor = False
         current_element = Element()
         current_element.load_parameters_from_database(id)
+        if request.method == "POST":
+            if(request.POST["formType"] == "uploadForm"):
+                form = UploadFileForm(request.POST, request.FILES)
+                if form.is_valid():
+                    handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
+            elif(request.POST["formType"] == "vendorFilter"):
+                vendors = get_all_vendors(request.POST["company"], request.POST["address"])
+                active_modal_vendor = True
+            elif(request.POST["formType"] == "addVendor"):
+                current_element.add_purchase_opportunity(request.POST["vendorID"],
+                                                         request.POST["price_unit"],
+                                                         request.POST["price"],
+                                                         request.POST["unit"],
+                                                         request.POST["link"],
+                                                         request.POST["code"]
+                                                         )
+            elif(request.POST["formType"] == "vendorDelete"):
+                current_element.delete_purchase_opportunity(request.POST["orderID"])
 
-        
+            current_element.load_parameters_from_database(id)          
 
-        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "newFileForm" : UploadFileForm()})
+
+        return render(request, 'element_detail.html', {"element": current_element, "all_media" : vendors, "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "price_units" : get_all_price_units()})
     else:
         return HttpResponseRedirect("/")
     
