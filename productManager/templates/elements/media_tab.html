@@ -1,7 +1,7 @@
 {% if active_tab == "media" %}
-  <div id="media" class="tab-pane fade active show pt-4 rounded">
+  <div id="media" class="tab-pane fade active show pt-4 pb-4 rounded">
 {% else %}
-<div id="media" class="tab-pane fade show pt-4 rounded">
+<div id="media" class="tab-pane fade show pt-4 pb-4 rounded">
 {% endif %}
     <h3>Media upload</h3>
     
@@ -22,6 +22,7 @@
     </div>
 </form>
 
+{% if element.mediaList %}
 <h3 class="mt-5">Media library</h3>
 
   <div class="media_container">
@@ -45,5 +46,6 @@
         
     {% endfor %}
   </div>
+  {% endif %}
 
   </div>

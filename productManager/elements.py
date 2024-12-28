@@ -11,10 +11,6 @@ class Element():
         self.code = code
         self.instock = instock
         self.icon = icon
-        self.mediaList = []
-        self.purchaseOpportunities = []
-        self.consist = []
-        self.bom = []
 
         self.conn = get_database_connection()
     def __str__(self):
@@ -30,27 +26,42 @@ class Element():
             if(cur.rowcount > 0):
                 self.__init__(result[0], result[1], result[2], result[3], result[4], result[5])
 
-            # all media
+    @property
+    def purchaseOpportunities(self):
+        po_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
+            for (id, company, price, priceunit, link, unit, code) in cur:
+                po_array.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
+            
+        return po_array
+
+    @property
+    def consist(self):
+        consist_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
+            for (name, pieces, type, icon, code, elementID) in cur:
+                consist_array.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
+        return consist_array
+    
+    @property
+    def mediaList(self):
+        media_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
             cur.execute(f"SELECT f.path, f.description FROM files as f, file_connects as fc, elements as e WHERE fc.file_id=f.id and e.id = fc.element_id and e.id={self.id}")
             for (path, description) in cur:
                 current_element = Media(path, description)
-                self.mediaList.append(current_element)
-
-            # all vendors
-            cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
-
-            for (id, company, price, priceunit, link, unit, code) in cur:
-                self.purchaseOpportunities.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
-            
-            # consist list
-            cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
-            for (name, pieces, type, icon, code, elementID) in cur:
-                self.consist.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
-            
-            # bom list
-            self.get_bom_list()
-
-    def get_bom_list(self):
+                media_array.append(current_element)
+        return media_array
+        
+    
+    @property
+    def bom(self):
+        bom_array = []
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"WITH RECURSIVE bom AS ( \
@@ -84,11 +95,11 @@ class Element():
                                     s.ElementID = c2.Container \
                                     and c2.Element = e2.id \
                             ) \
-                        SELECT * FROM bom;"
+                        SELECT ContainerID,ElementID,Pieces,ChildName,t.Description, IF(Icon IS NULL, NULL, files.path) FROM (bom, elements as e, element_types as t) LEFT JOIN files ON files.ID = Icon WHERE e.id=ElementID AND e.type=t.id;"
             cur.execute(query)
-            for (ContainerID, ElementID, Pieces, ChildName, Type, depth) in cur:
-                self.bom.append({'ContainerID' : ContainerID, 'ElementID' : ElementID, 'Pieces' : Pieces, 'ChildName' : ChildName, 'Type' : Type, "Depth" : depth})
-            
+            for (ContainerID, ElementID, Pieces, ChildName, Type, Icon) in cur:
+                bom_array.append({'ContainerID' : ContainerID, 'ElementID' : ElementID, 'Pieces' : Pieces, 'ChildName' : ChildName, 'Type' : Type, "Icon" : Icon})
+        return bom_array
 
     def change_icon(self, icon_path):
         if self.conn != None:

@@ -1,13 +1,14 @@
 {% if active_tab == "consist" %}
-  <div id="consist" class="tab-pane fade active show pt-4 rounded">
+  <div id="consist" class="tab-pane fade active show pt-3 pb-3 rounded">
 {% else %}
-    <div id="consist" class="tab-pane fade show pt-4 rounded">
+    <div id="consist" class="tab-pane fade show pt-3 pb-3 rounded">
 {% endif %}
 
 
-    <h3 class="pt-4">Consist</h3>
-    <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target=".add-consist-form">Add new subelement</button>
+    <h3 class="pt-2">Consist</h3>
+    <button type="button" class="btn btn-primary m-4" data-toggle="modal" data-target=".add-consist-form">Add new subelement</button>
 
+    {% if element.consist %}
     <table class="table-striped table-dark element_table">
         <thead>
         <tr>
@@ -77,5 +78,5 @@
     {% endfor %}
     </tbody>
     </table>
-
+    {% endif %}
   </div>

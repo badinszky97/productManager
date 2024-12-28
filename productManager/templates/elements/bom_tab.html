@@ -1,35 +1,38 @@
 {% if active_tab == "bom" %}
-  <div id="bom" class="tab-pane fade active show pt-4 rounded">
+  <div id="bom" class="tab-pane fade active show pt-4 pb-3 rounded">
 {% else %}
-    <div id="bom" class="tab-pane fade show pt-4 rounded">
+    <div id="bom" class="tab-pane fade show pt-4 pb-3 rounded">
 {% endif %}
-    <h3 class="pt-4">BOM</h3>
-
+    <h3 class="pt-4 pb-4">BOM List</h3>
+    
+    {% if element.bom %}
     <table class="table-striped table-dark element_table">
         <thead>
         <tr>
+            <th scope="col">Icon</th>
+            <th scope="col">Type</th>
             <th scope="col">ContainerID</th>
             <th scope="col">ElementID</th>   
             <th scope="col">Pieces</th>
             <th scope="col">ChildName</th>
-            <th scope="col">Type</th>
-            <th scope="col">Depth</th>
+            
         </tr>
         </thead>
         <tbody>
     {% for childElement in element.bom %}
             <tr>
-            <td scope="row">{{childElement.ContainerID}}</td>
+            <td scope="row"><img src="/media/{{childElement.Icon}}" class="table_icon"></td>
+            <td>{{childElement.Type}}</td>
+            <td>{{childElement.ContainerID}}</td>
             <td>{{childElement.ElementID}}</td>
             <td>{{childElement.Pieces}}</td>
             <td>{{childElement.ChildName}}</td>
-            <td>{{childElement.Type}}</td>
-            <td>{{childElement.Depth}}</td>
+            
 
 
           </tr>
     {% endfor %}
     </tbody>
     </table>
-
+    {% endif %}
   </div>
