@@ -54,7 +54,7 @@
   </div>
 <!-- End of Add new part trigger modal -->
 
-
+{% if elements %}
 <table class="table-striped table-dark element_table">
     <thead>
     <tr>
@@ -67,19 +67,21 @@
     </tr>
     </thead>
     <tbody>
-{% for element in elements %}
-        <tr onclick="window.location='/elements/{{element.id}}';" class="linkstyle">
-        <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
-        <td>{{element.id}}</td>
-        <td>{{element.name}}</td>
-        <td>{{element.type}}</td>
-        <td>{{element.code}}</td>
-        <td>{{element.instock}}</td>
-      </tr>
-{% endfor %}
-</tbody>
-</table>
 
+        {% for element in elements %}
+                <tr onclick="window.location='/elements/{{element.id}}';" class="linkstyle">
+                <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
+                <td>{{element.id}}</td>
+                <td>{{element.name}}</td>
+                <td>{{element.type}}</td>
+                <td>{{element.code}}</td>
+                <td>{{element.instock}}</td>
+              </tr>
+        {% endfor %}
 
+    </tbody>
+    </table>
+
+{% endif %}
 
 {% endblock %}
