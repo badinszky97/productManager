@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Dec 22, 2024 at 07:16 AM
+-- Generation Time: Dec 28, 2024 at 02:13 PM
 -- Server version: 11.6.2-MariaDB-ubu2404
 -- PHP Version: 8.2.26
 
@@ -33,6 +33,7 @@ CREATE TABLE `consist` (
   `Pieces` int(10) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+
 -- --------------------------------------------------------
 
 --
@@ -44,9 +45,9 @@ CREATE TABLE `elements` (
   `Name` varchar(30) NOT NULL,
   `Type` int(11) NOT NULL,
   `Code` varchar(10) NOT NULL,
-  `InStock` int(11) NOT NULL DEFAULT 0
+  `InStock` int(11) NOT NULL DEFAULT 0,
+  `Icon` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -77,29 +78,20 @@ INSERT INTO `element_types` (`ID`, `Description`) VALUES
 
 CREATE TABLE `files` (
   `ID` int(11) NOT NULL,
-  `ElementID` int(11) NOT NULL,
-  `FileType` int(11) NOT NULL,
+  `path` varchar(40) NOT NULL,
   `Description` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `file_types`
+-- Table structure for table `file_connects`
 --
 
-CREATE TABLE `file_types` (
-  `ID` int(11) NOT NULL,
-  `Description` varchar(20) NOT NULL
+CREATE TABLE `file_connects` (
+  `file_id` int(11) NOT NULL,
+  `element_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
---
--- Dumping data for table `file_types`
---
-
-INSERT INTO `file_types` (`ID`, `Description`) VALUES
-(1, 'Image'),
-(2, 'PDF');
 
 -- --------------------------------------------------------
 
@@ -111,8 +103,11 @@ CREATE TABLE `orderable` (
   `ID` int(11) NOT NULL,
   `VendorCode` int(11) NOT NULL,
   `ElementCode` int(11) NOT NULL,
+  `orderCode` varchar(20) NOT NULL,
   `Price` float NOT NULL,
-  `PriceUnit` int(11) NOT NULL
+  `PriceUnit` int(11) NOT NULL,
+  `link` text NOT NULL,
+  `unit` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
@@ -157,7 +152,7 @@ CREATE TABLE `vendors` (
 --
 ALTER TABLE `consist`
   ADD UNIQUE KEY `ContElementIndex` (`Container`,`Element`) USING BTREE,
-  ADD KEY `Element` (`Element`);
+  ADD KEY `consist_ibfk_2` (`Element`);
 
 --
 -- Indexes for table `elements`
@@ -165,7 +160,8 @@ ALTER TABLE `consist`
 ALTER TABLE `elements`
   ADD PRIMARY KEY (`ID`),
   ADD UNIQUE KEY `CodeUnique` (`Code`),
-  ADD KEY `TypeIndex` (`Type`);
+  ADD KEY `IconIndex` (`Icon`),
+  ADD KEY `TypeIndex` (`Type`) USING BTREE;
 
 --
 -- Indexes for table `element_types`
@@ -177,15 +173,14 @@ ALTER TABLE `element_types`
 -- Indexes for table `files`
 --
 ALTER TABLE `files`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FileTypeIndex` (`FileType`),
-  ADD KEY `ElementIDIndex` (`ElementID`);
+  ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `file_types`
+-- Indexes for table `file_connects`
 --
-ALTER TABLE `file_types`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `file_connects`
+  ADD KEY `file_id_index` (`file_id`),
+  ADD KEY `element_id_index` (`element_id`);
 
 --
 -- Indexes for table `orderable`
@@ -216,7 +211,7 @@ ALTER TABLE `vendors`
 -- AUTO_INCREMENT for table `elements`
 --
 ALTER TABLE `elements`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `element_types`
@@ -228,19 +223,13 @@ ALTER TABLE `element_types`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `file_types`
---
-ALTER TABLE `file_types`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `orderable`
 --
 ALTER TABLE `orderable`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `price_units`
@@ -252,7 +241,7 @@ ALTER TABLE `price_units`
 -- AUTO_INCREMENT for table `vendors`
 --
 ALTER TABLE `vendors`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -262,29 +251,30 @@ ALTER TABLE `vendors`
 -- Constraints for table `consist`
 --
 ALTER TABLE `consist`
-  ADD CONSTRAINT `consist_ibfk_1` FOREIGN KEY (`Container`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `consist_ibfk_2` FOREIGN KEY (`Element`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `consist_ibfk_1` FOREIGN KEY (`Container`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `consist_ibfk_2` FOREIGN KEY (`Element`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `elements`
 --
 ALTER TABLE `elements`
-  ADD CONSTRAINT `elements_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `element_types` (`ID`) ON UPDATE NO ACTION;
+  ADD CONSTRAINT `elements_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `element_types` (`ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `elements_ibfk_2` FOREIGN KEY (`Icon`) REFERENCES `files` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints for table `files`
+-- Constraints for table `file_connects`
 --
-ALTER TABLE `files`
-  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`FileType`) REFERENCES `file_types` (`ID`) ON UPDATE NO ACTION,
-  ADD CONSTRAINT `files_ibfk_2` FOREIGN KEY (`ElementID`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `file_connects`
+  ADD CONSTRAINT `file_connects_ibfk_1` FOREIGN KEY (`file_id`) REFERENCES `files` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `file_connects_ibfk_2` FOREIGN KEY (`element_id`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `orderable`
 --
 ALTER TABLE `orderable`
-  ADD CONSTRAINT `orderable_ibfk_1` FOREIGN KEY (`PriceUnit`) REFERENCES `price_units` (`ID`) ON UPDATE NO ACTION,
-  ADD CONSTRAINT `orderable_ibfk_2` FOREIGN KEY (`VendorCode`) REFERENCES `vendors` (`ID`) ON UPDATE NO ACTION,
-  ADD CONSTRAINT `orderable_ibfk_3` FOREIGN KEY (`ElementCode`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  ADD CONSTRAINT `orderable_ibfk_1` FOREIGN KEY (`PriceUnit`) REFERENCES `price_units` (`ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `orderable_ibfk_2` FOREIGN KEY (`VendorCode`) REFERENCES `vendors` (`ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `orderable_ibfk_3` FOREIGN KEY (`ElementCode`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

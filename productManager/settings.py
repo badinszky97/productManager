@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import mariadb
+import sys
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -92,6 +94,13 @@ DATABASES = {
         'user' : "django",
         'passwd' : "django",
         'database' : "product_manager",
+    },
+    'test':
+    {
+        'host' : "127.0.0.1",
+        'user' : "test",
+        'passwd' : "test",
+        'database' : "test",
     }
 }
 
@@ -99,17 +108,45 @@ PRODUCTMANAGER_VARIABLES = {
     'media_path' : '/var/product_manager/'
 }
 
+def is_testing():
+    return 'unittest' in sys.modules
+
+
 def get_database_connection():
-    try:
-        return mariadb.connect(
-                user=DATABASES["product_manager"]["user"],
-                password=DATABASES["product_manager"]["passwd"],
-                host=DATABASES["product_manager"]["host"],
-                port=3306,
-                database=DATABASES["product_manager"]["database"])
-    except mariadb.Error as e:
-        print(f"Error connecting to MariaDB Platform: {e}")
-        return None
+    if not is_testing():
+        try:
+            return mariadb.connect(
+                    user=DATABASES["product_manager"]["user"],
+                    password=DATABASES["product_manager"]["passwd"],
+                    host=DATABASES["product_manager"]["host"],
+                    port=3306,
+                    database=DATABASES["product_manager"]["database"])
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            return None
+    else:
+        try:
+            conn = mariadb.connect(
+                    user=DATABASES["test"]["user"],
+                    password=DATABASES["test"]["passwd"],
+                    host=DATABASES["test"]["host"],
+                    port=3306,
+                    database=DATABASES["test"]["database"])
+            cur = conn.cursor()
+
+
+            f = open('databases/product_manager.sql', 'r')
+            query = " ".join(f.readlines())
+            cur.execute(query)
+            
+
+            return conn
+
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            return None
+
+
 
 
 # Password validation
