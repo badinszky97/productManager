@@ -70,7 +70,9 @@ def element_details_view(request, id):
     print("get code: " + str(id))
     if request.user.is_authenticated:
         vendors = get_all_vendors()
+        filtered_parts = []
         active_modal_vendor = False
+        active_consist_modal = False
         current_element = Element()
         current_element.load_parameters_from_database(id)
         if request.method == "POST":
@@ -89,15 +91,26 @@ def element_details_view(request, id):
                                                          request.POST["code"],
                                                          request.POST["link"]
                                                          )
-
-
+            elif(request.POST["formType"] == "consistFilter"):
+                print(str(request.POST))
+                filtered_parts = get_all_elements(request.POST["element_type"],request.POST["name"],request.POST["code"])
+                active_consist_modal = True
+            elif(request.POST["formType"] == "addConsist"):
+                print(str(request.POST))
+                active_consist_modal = True
+                current_element.add_consist_element(request.POST["childID"], request.POST["pieces"])
+            elif(request.POST["formType"] == "consistModify"):
+                print(str(request.POST))
+                current_element.modify_consist_element(request.POST["childID"], request.POST["pieces"])
+            elif(request.POST["formType"] == "consistDelete"):
+                current_element.delete_consist_element(request.POST["childID"])
+                
 
             elif(request.POST["formType"] == "vendorDelete"):
                 current_element.delete_purchase_opportunity(request.POST["orderID"])
             current_element.load_parameters_from_database(id)          
 
-        print(str(current_element))
-        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "price_units" : get_all_price_units()})
+        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "active_consist_modal" : active_consist_modal, "price_units" : get_all_price_units(), "filtered_parts" : filtered_parts})
     else:
         return HttpResponseRedirect("/")
     

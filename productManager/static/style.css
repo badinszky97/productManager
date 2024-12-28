@@ -110,3 +110,11 @@ a:active {color:#FFFAFA;}
 .tablabel a:visited {color:#FFFAFA;}
 .tablabel a:hover {color:#FFFAFA; text-decoration: none;}
 .tablabel a:active {color:#FFFAFA;}
+
+.radio_hide
+{
+  visibility: hidden;
+}
+.radio_hide:checked + label {
+  background: green;
+}

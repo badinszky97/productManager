@@ -1,0 +1,92 @@
+
+<!-- Consist add modal -->
+{% if active_consist_modal %}
+    <div class="modal fade add-consist-form" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+{% else %}
+    <div class="modal fade add-consist-form" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="false">
+{% endif %}
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark">
+        
+        <!-- Filter -->
+        <form action="#" method="post">    
+            <div class="modal-body bg-dark">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                Type:<br>
+
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="all" value="all" checked>
+                <label class="btn btn-secondary" for="all">All</label>
+                
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="part" value="part">
+                <label class="btn btn-secondary" for="part">Part</label>
+                
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="operation" value="operation">
+                <label class="btn btn-secondary" for="operation">Operation</label>
+
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="assembly" value="assembly">
+                <label class="btn btn-secondary" for="assembly">Assembly</label>
+
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="product" value="product">
+                <label class="btn btn-secondary" for="product">Product</label>
+
+                <input type="radio" class="btn-check radio_hide" name="element_type" id="project" value="project">
+                <label class="btn btn-secondary" for="project">Project</label>
+
+
+
+                {% csrf_token %}
+                <table class="ml-auto mr-auto">
+                    <tr>
+                        <td>Name</td>
+                        <td><input type=text name="name"></td>
+                    </tr>
+                    <tr>
+                        <td>Code</td>
+                        <td><input type=text name="code"></td>
+                    </tr>
+                    <tr>
+                        <td colspan=2><input type="submit" class="btn btn-primary mt-2 w-100" value="Filter"/></td>
+                    </tr>
+                </table>
+                                         
+            </div>
+            <input type="hidden" name="formType" value="consistFilter">
+        </form>
+        <!-- End of filter -->
+
+        <table>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Code</th>
+
+            </tr>
+            </thead>
+            <tbody>
+                {% for filtered_part in filtered_parts %}
+                    <tr>
+                    <form action="#" method="post">   
+                        {% csrf_token %}
+                        <td>{{filtered_part.name}}</td>
+                        <td>{{filtered_part.type}}</td>
+                        <td>{{filtered_part.code}}</td>
+                        <td><input type=number name="pieces" required min=0 style="width:80px;" placeholder="qty" required></td>
+                        <td><input type="submit" class="btn btn-success" value="Add"></td>
+
+                        <input type="hidden" name="formType" value="addConsist">
+                        <input type="hidden" name="parentID" value="{{element.id}}">
+                        <input type="hidden" name="childID" value="{{filtered_part.id}}">
+
+                        </form>
+                    </tr>
+                {% endfor %}
+        </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+<!-- End of consist modal -->

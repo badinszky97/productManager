@@ -1,10 +1,6 @@
 <div id="vendors" class="tab-pane fade pb-3">
     <h3 class="pt-4">Purchase possibilities</h3>
-
     <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target=".add-vendor-form">Add purchase opportunity</button>
-
-
-
     <table class="table-striped table-dark element_table">
         <thead>
         <tr>
@@ -24,36 +20,16 @@
             <td>{{opportunitiy.unit}}</td>
             <td>{{opportunitiy.code}}</td>
             <td><a href="{{opportunitiy.link}}" class="btn btn-warning mt-2">Open</a> </td>
-
-
             <td>
-
-                <form action="#" method="post">    
-                            
+                <form action="#" method="post">                
                         {% csrf_token %}
                         <input type="hidden" name="formType" value="vendorDelete">
                         <input type="hidden" name="orderID" value="{{opportunitiy.id}}">
                         <input type="submit" class="btn btn-danger" value="Delete"/>
-         
-                    
                 </form>
-                
-
-
-
-
             </td>
-
-
-
-
-
           </tr>
     {% endfor %}
     </tbody>
     </table>
-
-
-
-
 </div>

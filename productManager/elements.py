@@ -13,6 +13,7 @@ class Element():
         self.icon = icon
         self.mediaList = []
         self.purchaseOpportunities = []
+        self.consist = []
 
         self.conn = get_database_connection()
     def __str__(self):
@@ -38,6 +39,12 @@ class Element():
             for (id, company, price, priceunit, link, unit, code) in cur:
                 self.purchaseOpportunities.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
             
+            cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
+            print(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
+            for (name, pieces, type, icon, code, elementID) in cur:
+                self.consist.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
+            
+
     def change_icon(self, icon_path):
         if self.conn != None:
             cur = self.conn.cursor()
@@ -68,7 +75,31 @@ class Element():
             cur.execute(query)
             self.conn.commit()
             self.load_parameters_from_database(self.id)
-        
+
+    def add_consist_element(self, childID, pieces):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})"
+            cur.execute(query)
+            self.conn.commit()
+            self.load_parameters_from_database(self.id)
+
+    def modify_consist_element(self, childID, pieces):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            print(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
+            cur.execute(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
+            self.conn.commit()
+            self.load_parameters_from_database(self.id)
+
+    def delete_consist_element(self, childID):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"DELETE FROM consist WHERE Element={childID} and Container={self.id}"
+            cur.execute(query)
+            self.conn.commit()
+            self.load_parameters_from_database(self.id)
+
     def delete_purchase_opportunity(self, opportunityID):
          if self.conn != None:
             cur = self.conn.cursor()
@@ -79,11 +110,20 @@ class Element():
             self.load_parameters_from_database(self.id)
  
 
-def get_all_elements(type="Part"):
+def get_all_elements(type="Part", name="", code=""):
         conn = get_database_connection()
         if conn != None:
             cur = conn.cursor()
-            cur.execute(f"SELECT * FROM elements WHERE type=(SELECT ID FROM element_types WHERE description='{type}')")
+
+            if(type=="all" or type==""):
+                type_statement = ""
+            else:
+                type_statement = f"type=(SELECT ID FROM element_types WHERE description='{type}') and"
+            query = ""
+            query = f"SELECT * FROM elements WHERE {type_statement} UPPER(name) LIKE UPPER('%{name}%') and UPPER(code) LIKE UPPER('%{code}%')"
+            
+            print(query)
+            cur.execute(query)
             all_elements = []
             for (id, name, type, code, instock, icon) in cur:
                 current_element = Element(id, name, type, code, instock, icon)
