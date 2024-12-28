@@ -67,6 +67,7 @@
   <li class="tablabel"><a href="#vendors">Purchase possibilities</a></li>
   {% if element.type != "Part" %}
     <li class="tablabel"><a href="#consist">Consist of</a></li>
+    <li class="tablabel"><a href="#bom">BOM list</a></li>
   {% endif %}
 </ul>
 <div class="tab-content">
@@ -79,6 +80,7 @@
     {% include "elements/consist_tab.html" %}
   {% endif %}
 
+  {% include "elements/bom_tab.html" %}
 
 <!-- Delete element Modal - Hidden by default-->
 <div class="modal fade" id="deleteelement" tabindex="-1" role="dialog" aria-labelledby="deleteelementlabel" aria-hidden="true">

@@ -6,17 +6,20 @@
         {
             "label": "Run MariaDB",
             "type": "shell",
-            "command": "docker run --name mariadb -v /home/bady/Documents/mariadb:/var/lib/mysql:Z -e MARIADB_ROOT_PASSWORD=root -d -p 3306:3306 mariadb:11.6"
+            "command": "docker run --name mariadb -v /home/bady/Documents/mariadb:/var/lib/mysql:Z -e MARIADB_ROOT_PASSWORD=root -d -p 3306:3306 mariadb:11.6",
+            "problemMatcher": []
         },
         {
             "label": "Run PhpMyAdmin",
             "type": "shell",
-            "command": "docker run --name phpmyadmin -d --link mariadb:db -p 8080:80 phpmyadmin"
+            "command": "docker run --name phpmyadmin -d --link mariadb:db -p 8080:80 phpmyadmin",
+            "problemMatcher": []
         },
         {
             "label": "Stop and remove all the containers",
             "type": "shell",
-            "command": "docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)"
+            "command": "docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)",
+            "problemMatcher": []
         },
         {
             "label": "Start",
@@ -28,7 +31,5 @@
             "type": "shell",
             "command": "source ./productManagerEnv/bin/activate"
         }
-
-        
     ]
 }

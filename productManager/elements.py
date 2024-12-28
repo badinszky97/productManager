@@ -14,6 +14,7 @@ class Element():
         self.mediaList = []
         self.purchaseOpportunities = []
         self.consist = []
+        self.bom = []
 
         self.conn = get_database_connection()
     def __str__(self):
@@ -43,9 +44,50 @@ class Element():
             
             # consist list
             cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
-            print(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
             for (name, pieces, type, icon, code, elementID) in cur:
                 self.consist.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
+            
+            # bom list
+            self.get_bom_list()
+
+    def get_bom_list(self):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"WITH RECURSIVE bom AS ( \
+                            SELECT \
+                                c1.Container as ContainerID, \
+                                c1.Element as ElementID, \
+                                c1.Pieces as Pieces, \
+                                e1.name as ChildName, \
+                                e1.Type, \
+                                0 AS depth \
+                            FROM \
+                                consist as c1, \
+                                elements as e1 \
+                            WHERE \
+                                c1.Element = e1.id \
+                                and \
+                                c1.Container={self.id} \
+                            UNION ALL \
+                                SELECT \
+                                    c2.Container as ContainerID, \
+                                    c2.Element as ElementID, \
+                                    c2.Pieces * s.Pieces as Pieces, \
+                                    e2.name as ChildName, \
+                                    e2.Type , \
+                                    depth + 1 \
+                                FROM \
+                                    consist as c2, \
+                                    elements as e2, \
+                                    bom as s \
+                                WHERE \
+                                    s.ElementID = c2.Container \
+                                    and c2.Element = e2.id \
+                            ) \
+                        SELECT * FROM bom;"
+            cur.execute(query)
+            for (ContainerID, ElementID, Pieces, ChildName, Type, depth) in cur:
+                self.bom.append({'ContainerID' : ContainerID, 'ElementID' : ElementID, 'Pieces' : Pieces, 'ChildName' : ChildName, 'Type' : Type, "Depth" : depth})
             
 
     def change_icon(self, icon_path):
