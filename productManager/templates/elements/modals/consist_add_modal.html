@@ -55,8 +55,8 @@
             <input type="hidden" name="formType" value="consistFilter">
         </form>
         <!-- End of filter -->
-
-        <table>
+        {% if filtered_parts %}
+        <table class="table-striped table-dark element_table mb-3">
         <thead>
             <tr>
                 <th scope="col">Name</th>
@@ -70,7 +70,8 @@
                     <tr>
                     <form action="#" method="post">   
                         {% csrf_token %}
-                        <td scope="row">{{filtered_part.name}}</td>
+                        <td scope="row"><img src="/media/{{filtered_part.icon}}" class="table_icon"></td>
+                        <td>{{filtered_part.name}}</td>
                         <td>{{filtered_part.type}}</td>
                         <td>{{filtered_part.code}}</td>
                         <td><input type=number name="pieces" required min=0 style="width:80px;" placeholder="qty" required></td>
@@ -85,6 +86,7 @@
                 {% endfor %}
         </tbody>
         </table>
+        {% endif %}
 
       </div>
     </div>

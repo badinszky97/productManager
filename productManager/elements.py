@@ -29,16 +29,19 @@ class Element():
             if(cur.rowcount > 0):
                 self.__init__(result[0], result[1], result[2], result[3], result[4], result[5])
 
+            # all media
             cur.execute(f"SELECT f.path, f.description FROM files as f, file_connects as fc, elements as e WHERE fc.file_id=f.id and e.id = fc.element_id and e.id={self.id}")
             for (path, description) in cur:
                 current_element = Media(path, description)
                 self.mediaList.append(current_element)
 
+            # all vendors
             cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
 
             for (id, company, price, priceunit, link, unit, code) in cur:
                 self.purchaseOpportunities.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
             
+            # consist list
             cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
             print(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
             for (name, pieces, type, icon, code, elementID) in cur:
