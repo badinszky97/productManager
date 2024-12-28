@@ -70,7 +70,7 @@
                     <tr>
                     <form action="#" method="post">   
                         {% csrf_token %}
-                        <td>{{filtered_part.name}}</td>
+                        <td scope="row">{{filtered_part.name}}</td>
                         <td>{{filtered_part.type}}</td>
                         <td>{{filtered_part.code}}</td>
                         <td><input type=number name="pieces" required min=0 style="width:80px;" placeholder="qty" required></td>

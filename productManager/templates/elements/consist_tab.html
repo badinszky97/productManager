@@ -1,4 +1,10 @@
-<div id="consist" class="tab-pane fade">
+{% if active_tab == "consist" %}
+  <div id="consist" class="tab-pane fade active show pt-4 rounded">
+{% else %}
+    <div id="consist" class="tab-pane fade show pt-4 rounded">
+{% endif %}
+
+
     <h3 class="pt-4">Consist</h3>
     <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target=".add-consist-form">Add new subelement</button>
 
@@ -21,7 +27,7 @@
             <td>{{childElement.name}}</td>
             <td>{{childElement.type}}</td>
             <td>{{childElement.code}}</td>
-            <form action="#" method="post">  
+            <form action="#consist" method="post">  
                 <td><input type=number name="pieces" required min=0 value={{childElement.pieces}} style="width:50px;" required></td>
                 <td>
                         {% csrf_token %}
@@ -34,7 +40,7 @@
 
             <td>
                 <!-- Button trigger delete modal -->
-                <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#deleteconsist{{forloop.counter}}">
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteconsist{{forloop.counter}}">
                     Delete
                 </button>
             </td>
@@ -54,7 +60,7 @@
                     Are you sure?
                     </div>
                     <div class="modal-footer">
-                        <form action="#" method="post">  
+                        <form action="#consist" method="post">  
                             {% csrf_token %}
                             <input type="hidden" name="formType" value="consistDelete">
                             <input type="hidden" name="childID" value="{{childElement.elementID}}">

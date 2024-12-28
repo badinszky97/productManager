@@ -75,6 +75,7 @@ def element_details_view(request, id):
         active_consist_modal = False
         current_element = Element()
         current_element.load_parameters_from_database(id)
+        active_tab="media" # default tab
         if request.method == "POST":
             if(request.POST["formType"] == "uploadForm"):
                 form = UploadFileForm(request.POST, request.FILES)
@@ -83,6 +84,7 @@ def element_details_view(request, id):
             elif(request.POST["formType"] == "vendorFilter"):
                 vendors = get_all_vendors(request.POST["company"], request.POST["address"])
                 active_modal_vendor = True
+                active_tab="vendors"
             elif(request.POST["formType"] == "addVendor"):
                 current_element.add_purchase_opportunity(request.POST["vendorID"],
                                                          request.POST["price_unit"],
@@ -91,26 +93,31 @@ def element_details_view(request, id):
                                                          request.POST["code"],
                                                          request.POST["link"]
                                                          )
+                active_tab="vendors"
             elif(request.POST["formType"] == "consistFilter"):
-                print(str(request.POST))
                 filtered_parts = get_all_elements(request.POST["element_type"],request.POST["name"],request.POST["code"])
                 active_consist_modal = True
+                active_tab="consist"
+
             elif(request.POST["formType"] == "addConsist"):
-                print(str(request.POST))
                 active_consist_modal = True
+                active_tab="consist"
                 current_element.add_consist_element(request.POST["childID"], request.POST["pieces"])
+
             elif(request.POST["formType"] == "consistModify"):
-                print(str(request.POST))
+                active_tab="consist"
                 current_element.modify_consist_element(request.POST["childID"], request.POST["pieces"])
+
             elif(request.POST["formType"] == "consistDelete"):
                 current_element.delete_consist_element(request.POST["childID"])
+                active_tab="consist"
                 
 
             elif(request.POST["formType"] == "vendorDelete"):
                 current_element.delete_purchase_opportunity(request.POST["orderID"])
             current_element.load_parameters_from_database(id)          
 
-        return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "active_consist_modal" : active_consist_modal, "price_units" : get_all_price_units(), "filtered_parts" : filtered_parts})
+        return render(request, 'element_detail.html', {"element": current_element, "active_tab" : active_tab, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "active_consist_modal" : active_consist_modal, "price_units" : get_all_price_units(), "filtered_parts" : filtered_parts})
     else:
         return HttpResponseRedirect("/")
     
