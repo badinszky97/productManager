@@ -91,10 +91,10 @@ def element_details_view(request, id):
                                                          )
 
 
-                current_element.load_parameters_from_database(id)
+
             elif(request.POST["formType"] == "vendorDelete"):
                 current_element.delete_purchase_opportunity(request.POST["orderID"])
-                current_element.load_parameters_from_database(id)          
+            current_element.load_parameters_from_database(id)          
 
         print(str(current_element))
         return render(request, 'element_detail.html', {"element": current_element, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "price_units" : get_all_price_units()})

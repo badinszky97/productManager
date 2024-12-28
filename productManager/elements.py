@@ -21,8 +21,8 @@ class Element():
     def load_parameters_from_database(self, part_id):
         if self.conn != None:
             cur = self.conn.cursor()
-            
-            cur.execute(f"SELECT e.id, e.name, t.description, e.code, e.instock, IF(e.icon is null, null, f.path) as icon FROM elements as e, files as f, element_types as t WHERE e.ID={part_id} and  e.type=t.id and (e.icon=f.id or e.icon is null) LIMIT 1;")
+            query = f"SELECT e.id, e.Name, t.Description, e.Code, e.InStock, IF(e.Icon IS NULL, NULL, files.path) as Icon FROM (elements as e, element_types as t) LEFT JOIN files ON files.ID=e.Icon WHERE e.ID={part_id} and e.Type=t.ID;"
+            cur.execute(query)
             
             result = cur.fetchone() 
             if(cur.rowcount > 0):
@@ -64,7 +64,7 @@ class Element():
     def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, code, link):
         if self.conn != None:
             cur = self.conn.cursor()
-            query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, link, unit, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
+            query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, unit, link, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
             cur.execute(query)
             self.conn.commit()
             self.load_parameters_from_database(self.id)

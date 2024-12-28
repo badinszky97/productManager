@@ -55,12 +55,7 @@ def get_all_media():
         if conn != None:
             cur = conn.cursor()
 
-            query = "SELECT id,path,Description, Count(ID) AS refs FROM \
-            ( SELECT f.id, f.path, f.Description FROM files AS f, file_connects AS fc WHERE f.ID=fc.file_id \
-            UNION ALL \
-            SELECT f.id, f.path, f.Description FROM files AS f, elements AS e WHERE f.ID=e.Icon) \
-            AS table1 \
-            GROUP BY ID;"
+            query = "SELECT files.id,path,Description, sum(if(icon is null, 0,1)) as refs FROM files LEFT JOIN elements ON elements.Icon=files.id group by files.id;"
 
             cur.execute(query)
             all_meida = []
