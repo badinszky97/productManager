@@ -126,21 +126,12 @@ def get_database_connection():
             return None
     else:
         try:
-            conn = mariadb.connect(
+            return mariadb.connect(
                     user=DATABASES["test"]["user"],
                     password=DATABASES["test"]["passwd"],
                     host=DATABASES["test"]["host"],
                     port=3306,
                     database=DATABASES["test"]["database"])
-            cur = conn.cursor()
-
-
-            f = open('databases/product_manager.sql', 'r')
-            query = " ".join(f.readlines())
-            cur.execute(query)
-            
-
-            return conn
 
         except mariadb.Error as e:
             print(f"Error connecting to MariaDB Platform: {e}")
