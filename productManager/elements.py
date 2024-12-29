@@ -48,11 +48,21 @@ class Element():
             query = f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type"
             cur.execute(query)
             for (name, pieces, type, icon, code, elementID) in cur:
-                new_element = Element()
-                new_element.load_parameters_from_database(elementID)
-                consist_array.append(new_element)
+                consist_array.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
         return consist_array
 
+    @property
+    def consist_short_list(self):
+        consist_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT elements.id FROM consist, elements, element_types WHERE consist.Container={self.id} and consist.Element=elements.id and element_types.id=elements.Type;"
+            cur.execute(query)
+            for (elementID) in cur:
+                new_element = Element()
+                new_element.load_parameters_from_database(elementID[0])
+                consist_array.append(new_element)
+        return consist_array
 
     @property
     def get_tree_diagram_piece(self):
@@ -60,7 +70,7 @@ class Element():
         tree_view = f"<div class=\"entry\">\n<span>{self.name}</span>\n"
         if(len(self.consist) > 0):
             tree_view = tree_view + "<div class=\"branch\">\n"
-            for element in self.consist:
+            for element in self.consist_short_list:
                 tree_view = tree_view + element.get_tree_diagram_piece
             tree_view = tree_view + "</div>\n"
 
