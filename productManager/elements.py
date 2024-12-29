@@ -1,5 +1,9 @@
 from .settings import get_database_connection
 from .media import Media
+from joblib import Parallel,delayed 
+
+import time
+
 
 
 class Element():
@@ -34,7 +38,6 @@ class Element():
             cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
             for (id, company, price, priceunit, link, unit, code) in cur:
                 po_array.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
-            
         return po_array
 
     @property
@@ -42,11 +45,31 @@ class Element():
         consist_array = []
         if self.conn != None:
             cur = self.conn.cursor()
-            cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
+            query = f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type"
+            cur.execute(query)
             for (name, pieces, type, icon, code, elementID) in cur:
-                consist_array.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
+                new_element = Element()
+                new_element.load_parameters_from_database(elementID)
+                consist_array.append(new_element)
         return consist_array
+
+
+    @property
+    def get_tree_diagram_piece(self):
+        start = time.time()
+        tree_view = f"<div class=\"entry\">\n<span>{self.name}</span>\n"
+        if(len(self.consist) > 0):
+            tree_view = tree_view + "<div class=\"branch\">\n"
+            for element in self.consist:
+                tree_view = tree_view + element.get_tree_diagram_piece
+            tree_view = tree_view + "</div>\n"
+
+        tree_view = tree_view + "\n" + "</div>\n"
+        stop = time.time()
+        print(f"Tree execution time of {self.name}: " + str(stop-start))
+        return tree_view
     
+
     @property
     def mediaList(self):
         media_array = []
