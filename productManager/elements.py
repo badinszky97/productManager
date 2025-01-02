@@ -7,7 +7,7 @@ import time
 
 
 class Element():
-    def __init__(self, id=0, name="", type=0, code="", instock=0, icon=""):
+    def __init__(self, id=0, name="", type="", code="", instock=0, icon=""):
         """ Create element from scratch"""
         self.id = id
         self.name = name
@@ -17,6 +17,10 @@ class Element():
         self.icon = icon
 
         self.conn = get_database_connection()
+        #self.conn.autocommit = True
+    def __del__(self):
+        self.conn.close()
+
     def __str__(self):
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
