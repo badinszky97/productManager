@@ -267,39 +267,23 @@ def users_view(request):
     else:
         return HttpResponseRedirect("/")
     
-def change_password(request):
-    messages = []
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            messages.append(("Password successfully changed!", "success" ))
-            return redirect('/')
-
-        else:
-            messages.error(request, 'Password change was not successful')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {'form': form, 'messages': messages})
-
 def myaccount_view(request):
+    alerts = []
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            print("megy")
-            return redirect('/myaccount')
+            alerts.append({"text":"Password successfully changed!", "type" : "success" })
+            form = PasswordChangeForm(request.user)
+            return render(request, 'my_account.html', {'form': form, 'alerts' : alerts})
 
         else:
-            messages.error(request, 'Please correct the error below.')
+            alerts.append({"text": 'Password change was not successful', "type" : "error"})
     else:
         form = PasswordChangeForm(request.user)
 
-    return render(request, 'my_account.html', {'form': form})
+    return render(request, 'my_account.html', {'form': form, 'alerts' : alerts})
 
 def logout_view(request):
     if request.user.is_authenticated == True:

@@ -129,3 +129,12 @@ a:active {color:#FFFAFA;}
     padding: 30px;
     margin-top: 100px;
 }
+
+#messageDiv
+{
+  display: block;
+    position: absolute;
+    z-index: 100;
+    bottom: 20px;
+    right: 20px;
+}
