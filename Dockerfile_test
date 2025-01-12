@@ -23,5 +23,7 @@ RUN service mariadb start && mariadb -e "CREATE DATABASE IF NOT EXISTS $DJANGO_T
     mariadb -e "GRANT ALL PRIVILEGES ON $DJANGO_TEST_USER.* TO '$DJANGO_TEST_DATABASE'@'%';" && \
     mariadb -e "FLUSH PRIVILEGES;"
 
+WORKDIR /opt/productManager
+
 ENTRYPOINT ["/bin/sh", "-c" , "service mariadb start && python3 manage.py test"]
 
