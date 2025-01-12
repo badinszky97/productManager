@@ -16,5 +16,6 @@ jobs:
         echo "build:"
         printenv
         echo "vars: ${{vars.DJANGO_TEST_DATABASE}}"
-        docker build -t djangotestdocker --build-arg DJANGO_TEST_DATABASE=${{vars.DJANGO_TEST_DATABASE}} --build-arg DJANGO_TEST_USER=${{vars.DJANGO_TEST_USER}}  --build-arg DJANGO_TEST_PASSWORD=${{vars.DJANGO_TEST_PASSWORD}} -f Dockerfile_test .
+        docker build -t djangotestdocker -f Dockerfile_test .
+        docker run djangotestdocker
         
