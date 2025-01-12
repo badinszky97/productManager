@@ -118,3 +118,23 @@ a:active {color:#FFFAFA;}
 .radio_hide:checked + label {
   background: green;
 }
+
+.section_container
+{
+  background: #343a40;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    padding: 30px;
+    margin-top: 100px;
+}
+
+#messageDiv
+{
+  display: block;
+    position: absolute;
+    z-index: 100;
+    bottom: 20px;
+    right: 20px;
+}

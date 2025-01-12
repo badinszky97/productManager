@@ -1,9 +1,13 @@
 from .settings import get_database_connection
 from .media import Media
+from joblib import Parallel,delayed 
+
+import time
+
 
 
 class Element():
-    def __init__(self, id=0, name="", type=0, code="", instock=0, icon=""):
+    def __init__(self, id=0, name="", type="", code="", instock=0, icon=""):
         """ Create element from scratch"""
         self.id = id
         self.name = name
@@ -13,6 +17,10 @@ class Element():
         self.icon = icon
 
         self.conn = get_database_connection()
+        #self.conn.autocommit = True
+    def __del__(self):
+        self.conn.close()
+
     def __str__(self):
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
@@ -34,7 +42,6 @@ class Element():
             cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
             for (id, company, price, priceunit, link, unit, code) in cur:
                 po_array.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
-            
         return po_array
 
     @property
@@ -42,11 +49,41 @@ class Element():
         consist_array = []
         if self.conn != None:
             cur = self.conn.cursor()
-            cur.execute(f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type")
+            query = f"SELECT e.Name, c.Pieces, t.Description as Type, files.path as Icon, e.code, e.id FROM (consist as c, elements as e, element_types as t) LEFT JOIN files on files.ID=e.Icon where c.Container={self.id} and c.Element=e.id and t.id=e.Type"
+            cur.execute(query)
             for (name, pieces, type, icon, code, elementID) in cur:
                 consist_array.append({'name' : name, 'pieces' : pieces, 'type' : type, 'icon' : icon, 'code' : code, "elementID" : elementID})
         return consist_array
+
+    @property
+    def consist_short_list(self):
+        consist_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT elements.id FROM consist, elements, element_types WHERE consist.Container={self.id} and consist.Element=elements.id and element_types.id=elements.Type;"
+            cur.execute(query)
+            for (elementID) in cur:
+                new_element = Element()
+                new_element.load_parameters_from_database(elementID[0])
+                consist_array.append(new_element)
+        return consist_array
+
+    @property
+    def get_tree_diagram_piece(self):
+        start = time.time()
+        tree_view = f"<div class=\"entry\">\n<span>{self.name}</span>\n"
+        if(len(self.consist) > 0):
+            tree_view = tree_view + "<div class=\"branch\">\n"
+            for element in self.consist_short_list:
+                tree_view = tree_view + element.get_tree_diagram_piece
+            tree_view = tree_view + "</div>\n"
+
+        tree_view = tree_view + "\n" + "</div>\n"
+        stop = time.time()
+        print(f"Tree execution time of {self.name}: " + str(stop-start))
+        return tree_view
     
+
     @property
     def mediaList(self):
         media_array = []
@@ -116,6 +153,7 @@ class Element():
             query = f"INSERT INTO elements (Name, Type, Code) VALUES ('{self.name}', (SELECT ID FROM element_types WHERE description=\'{self.type}\'), '{self.code}')"
             cur.execute(query)
             self.conn.commit()
+            self.load_parameters_from_database(cur.lastrowid)
     
     def delete(self):
         if self.conn != None:
@@ -135,6 +173,7 @@ class Element():
     def add_consist_element(self, childID, pieces):
         if self.conn != None:
             cur = self.conn.cursor()
+            print(f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})")
             query = f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})"
             cur.execute(query)
             self.conn.commit()
@@ -143,7 +182,6 @@ class Element():
     def modify_consist_element(self, childID, pieces):
         if self.conn != None:
             cur = self.conn.cursor()
-            print(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
             cur.execute(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
             self.conn.commit()
             self.load_parameters_from_database(self.id)

@@ -14,6 +14,13 @@ from .vendor import Vendor
 from .vendor import get_all_price_units
 import os.path, random, string
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect
+
+
 
 
 
@@ -245,6 +252,38 @@ def vendor_delete(request, id):
         return HttpResponseRedirect("/vendors")
     else:
         return HttpResponseRedirect("/")
+    
+# **************************************************
+# Users
+# **************************************************
+def users_view(request):
+    if request.user.is_authenticated:
+        user = request.user
+        if(user.is_superuser):
+            all_users = User.objects.values()
+            return render(request, 'users.html', {"users": all_users})
+        else:
+            return HttpResponseRedirect("/")
+    else:
+        return HttpResponseRedirect("/")
+    
+def myaccount_view(request):
+    alerts = []
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            alerts.append({"text":"Password successfully changed!", "type" : "success" })
+            form = PasswordChangeForm(request.user)
+            return render(request, 'my_account.html', {'form': form, 'alerts' : alerts})
+
+        else:
+            alerts.append({"text": 'Password change was not successful', "type" : "error"})
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, 'my_account.html', {'form': form, 'alerts' : alerts})
 
 def logout_view(request):
     if request.user.is_authenticated == True:

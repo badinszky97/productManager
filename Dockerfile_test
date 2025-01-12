@@ -1,0 +1,28 @@
+FROM python:3.12.3
+
+ENV DEBIAN_FRONTEND="noninteractive"
+
+# install app dependencies
+RUN apt-get update && apt-get install -y
+RUN mkdir /opt/productManager 
+COPY . /opt/productManager
+
+RUN pip3 install -r /opt/productManager/requirements.txt
+
+
+RUN apt-get update && apt-get install -y \
+    mariadb-server \
+    && rm -rf /var/lib/apt/lists/*
+# Set environment variables for database configuration
+ENV DJANGO_TEST_ROOT_PASS=root_password
+ENV DJANGO_TEST_DATABASE=test
+ENV DJANGO_TEST_USER=test
+ENV DJANGO_TEST_PASSWORD=test
+
+RUN service mariadb start
+
+RUN service mariadb start && \
+    mariadb -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && \
+    mariadb -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && \
+    mariadb -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';" && \
+    mariadb -e "FLUSH PRIVILEGES;"
