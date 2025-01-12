@@ -10,4 +10,5 @@ jobs:
     steps:
     - name: Install Dependencies
       run: |
+        ls productManager
         docker build -t djangotestdocker .
