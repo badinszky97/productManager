@@ -15,6 +15,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN service mariadb start
+
+ENV DJANGO_TEST_DATABASE=test
+ENV DJANGO_TEST_USER=test
+ENV DJANGO_TEST_PASSWORD=test
+
 RUN echo "database: $DJANGO_TEST_DATABASE"
 RUN echo "user: $DJANGO_TEST_USER"
 RUN echo "password: $DJANGO_TEST_DATDJANGO_TEST_PASSWORDABASE"
