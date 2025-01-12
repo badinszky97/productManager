@@ -11,5 +11,5 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install Dependencies
       run: |
-        docker build -t djangotestdocker .
+        docker build -t djangotestdocker ./Dockerfile_test
         
