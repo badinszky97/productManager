@@ -1,0 +1,10 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Test-fundamentals:
+    steps:
+      uses: actions/checkout@v4
+        with:
+          path: ./Dockerfile_test
+      - run: echo "Docker is running"
