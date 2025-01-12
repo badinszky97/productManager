@@ -15,5 +15,6 @@ jobs:
         ls
         echo "build:"
         printenv
+        echo "vars: ${{vars.DJANGO_TEST_DATABASE}}"
         docker build -t djangotestdocker -f Dockerfile_test .
         
