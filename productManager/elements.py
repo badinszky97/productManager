@@ -153,6 +153,7 @@ class Element():
             query = f"INSERT INTO elements (Name, Type, Code) VALUES ('{self.name}', (SELECT ID FROM element_types WHERE description=\'{self.type}\'), '{self.code}')"
             cur.execute(query)
             self.conn.commit()
+            self.load_parameters_from_database(cur.lastrowid)
     
     def delete(self):
         if self.conn != None:
@@ -172,6 +173,7 @@ class Element():
     def add_consist_element(self, childID, pieces):
         if self.conn != None:
             cur = self.conn.cursor()
+            print(f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})")
             query = f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})"
             cur.execute(query)
             self.conn.commit()
@@ -180,7 +182,6 @@ class Element():
     def modify_consist_element(self, childID, pieces):
         if self.conn != None:
             cur = self.conn.cursor()
-            print(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
             cur.execute(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
             self.conn.commit()
             self.load_parameters_from_database(self.id)
