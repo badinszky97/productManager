@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN service mariadb start
-RUN mariadb -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
-RUN mariadb -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';"
-RUN mariadb -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';"
+RUN mariadb -e "CREATE DATABASE IF NOT EXISTS ${{ env.DJANGO_TEST_DATABASE }};"
+RUN mariadb -e "CREATE USER IF NOT EXISTS '${{ env.DJANGO_TEST_USER }}'@'%' IDENTIFIED BY '${{ env.DJANGO_TEST_PASSWORD }}';"
+RUN mariadb -e "GRANT ALL PRIVILEGES ON ${{ env.DJANGO_TEST_USER }}.* TO '${{ env.DJANGO_TEST_DATABASE }}'@'%';"
 RUN mariadb -e "FLUSH PRIVILEGES;"
