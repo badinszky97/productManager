@@ -14,8 +14,6 @@ RUN apt-get update && apt-get install -y \
     mariadb-server \
     && rm -rf /var/lib/apt/lists/*
 
-RUN service mariadb start
-
 RUN service mariadb start && \
     mariadb -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && \
     mariadb -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && \
