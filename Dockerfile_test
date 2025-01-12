@@ -13,11 +13,6 @@ RUN pip3 install -r /opt/productManager/requirements.txt
 RUN apt-get update && apt-get install -y \
     mariadb-server \
     && rm -rf /var/lib/apt/lists/*
-# Set environment variables for database configuration
-ENV DJANGO_TEST_ROOT_PASS=root_password
-ENV DJANGO_TEST_DATABASE=test
-ENV DJANGO_TEST_USER=test
-ENV DJANGO_TEST_PASSWORD=test
 
 RUN service mariadb start
 
