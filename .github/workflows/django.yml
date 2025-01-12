@@ -14,5 +14,6 @@ jobs:
         echo "ls:"
         ls
         echo "build:"
+        printenv
         docker build -t djangotestdocker -f Dockerfile_test .
         
