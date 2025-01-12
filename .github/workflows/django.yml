@@ -10,5 +10,4 @@ jobs:
     steps:
     - name: Install Dependencies
       run: |
-        pwd
-        ls
+        docker build -t djangotestdocker .
