@@ -14,5 +14,5 @@ jobs:
         echo "ls:"
         ls
         echo "build:"
-        docker build -t djangotestdocker ./Dockerfile_test
+        docker build -t djangotestdocker -f Dockerfile_test .
         
