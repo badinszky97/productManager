@@ -137,6 +137,42 @@ class Element():
             for (ContainerID, ElementID, Pieces, ChildName, Type, Icon) in cur:
                 bom_array.append({'ContainerID' : ContainerID, 'ElementID' : ElementID, 'Pieces' : Pieces, 'ChildName' : ChildName, 'Type' : Type, "Icon" : Icon})
         return bom_array
+    
+    @property
+    def prices(self):
+        price_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT ElementID, Pieces, ChildName, Description, Icon, Min(Price) as min_price, Max(Price) as max_price, Pieces*Min(Price) as min_sum_price,Pieces*Max(Price) as max_sum_price , UnitType FROM \
+                        (SELECT ElementID, SUM(Pieces) as Pieces, ChildName, Description, Icon FROM \
+                            (WITH RECURSIVE bom AS( SELECT c1.Container AS ContainerID, c1.Element AS ElementID, c1.Pieces AS Pieces, e1.name AS ChildName, e1.Type, 0 AS depth FROM consist AS c1, elements AS e1 WHERE c1.Element = e1.id AND c1.Container = {self.id} UNION ALL SELECT c2.Container AS ContainerID, c2.Element AS ElementID, c2.Pieces * s.Pieces AS Pieces, e2.name AS ChildName, e2.Type, depth + 1 FROM consist AS c2, elements AS e2, bom AS s WHERE s.ElementID = c2.Container AND c2.Element = e2.id ) SELECT ContainerID, ElementID, Pieces, ChildName, t.Description, IF(Icon IS NULL, NULL, files.path) as Icon FROM ( bom, elements AS e, element_types AS t ) LEFT JOIN files ON files.ID = Icon WHERE e.id = ElementID AND e.type = t.id) bom \
+                        WHERE (bom.Description = \"Operation\" OR bom.Description = \"Part\") GROUP BY ElementID) \
+                        pricelist, orderable, price_units WHERE orderable.ElementCode = ElementID and PriceUnit = price_units.id \
+                        GROUP BY ElementID;"
+            print(query)
+            cur.execute(query)
+            for (ElementID, Pieces, ChildName, Description, Icon, min_price, max_price, min_sum_price, max_sum_price , UnitType) in cur:
+                price_array.append({'ElementID' : ElementID, 'Pieces' : Pieces, 'ChildName' : ChildName, 'Description' : Description, 'Icon' : Icon, 'min_price' : min_price, 'max_price' : max_price, 'min_sum_price' : min_sum_price, 'max_sum_price' : max_sum_price, 'UnitType' : UnitType})
+        return price_array
+    
+    @property
+    def sum_price(self):
+        price_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT ChildName, Description, SUM(min_sum_price) as min, SUM(max_sum_price) as max, UnitType, Pieces, unit FROM \
+                    (SELECT ChildName, Description, Pieces*Min(Price) as min_sum_price,Pieces*Max(Price) as max_sum_price , UnitType, Pieces, unit FROM \
+                    (SELECT ElementID, SUM(Pieces) as Pieces, ChildName, Description, Icon FROM \
+                    (WITH RECURSIVE bom AS( SELECT c1.Container AS ContainerID, c1.Element AS ElementID, c1.Pieces AS Pieces, e1.name AS ChildName, e1.Type, 0 AS depth FROM consist AS c1, elements AS e1 WHERE c1.Element = e1.id AND c1.Container = {self.id} UNION ALL SELECT c2.Container AS ContainerID, c2.Element AS ElementID, c2.Pieces * s.Pieces AS Pieces, e2.name AS ChildName, e2.Type, depth + 1 FROM consist AS c2, elements AS e2, bom AS s WHERE s.ElementID = c2.Container AND c2.Element = e2.id ) SELECT ContainerID, ElementID, Pieces, ChildName, t.Description, IF(Icon IS NULL, NULL, files.path) as Icon FROM ( bom, elements AS e, element_types AS t ) LEFT JOIN files ON files.ID = Icon WHERE e.id = ElementID AND e.type = t.id) bom \
+                    WHERE (bom.Description = \"Operation\" OR bom.Description = \"Part\") GROUP BY ElementID) \
+                    pricelist, orderable, price_units WHERE orderable.ElementCode = ElementID and PriceUnit = price_units.id \
+                    GROUP BY ElementID) sumlist \
+                    GROUP BY Description;"
+            print(query)
+            cur.execute(query)
+            for (ChildName, Description, min_price, max_price, UnitType, pieces, unit) in cur:
+                price_array.append({'ChildName' : ChildName, 'Description' : Description, 'min_price' : min_price, 'max_price' : max_price, 'UnitType' : UnitType, 'pieces':pieces, 'unit':unit})
+        return price_array
 
     def change_icon(self, icon_path):
         if self.conn != None:

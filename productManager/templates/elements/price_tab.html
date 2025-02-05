@@ -1,0 +1,68 @@
+{% if active_tab == "price" %}
+  <div id="price" class="tab-pane fade active show pt-4 pb-4 rounded">
+{% else %}
+<div id="price" class="tab-pane fade show pt-4 pb-4 rounded">
+{% endif %}
+    <h3>Price</h3>
+    
+    {% if element.bom %}
+
+      <table class="table-striped table-dark element_table">
+        <thead>
+        <tr>
+            <th scope="col">Description</th>
+            <th scope="col">Min Price</th>
+            <th scope="col">Max Price</th>
+            <th scope="col">Pieces</th>
+            
+            
+        </tr>
+        </thead>
+        <tbody>
+    {% for childElement in element.sum_price %}
+            <tr>
+            <td>{{childElement.Description}}</td>
+            <td>{{childElement.min_price}} {{childElement.UnitType}}</td>
+            <td>{{childElement.max_price}} {{childElement.UnitType}}  </td>
+            <td>{{childElement.pieces}} {{childElement.unit}}  </td>
+
+          </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+  
+    
+    <table class="table-striped table-dark element_table mt-5">
+        <thead>
+        <tr>
+            <th scope="col">Icon</th>
+            <th scope="col">ChildName</th>
+            <th scope="col">Pieces</th>
+            <th scope="col">Type</th>
+            <th scope="col">Minimum unit price</th>   
+            <th scope="col">Maximum unit price</th>
+            <th scope="col">Minimum sum price</th>
+            <th scope="col">Maximum sum price</th>
+            
+        </tr>
+        </thead>
+        <tbody>
+    {% for childElement in element.prices %}
+            <tr>
+            <td scope="row"><img src="/media/{{childElement.Icon}}" class="table_icon"></td>
+            <td>{{childElement.ChildName}}</td>
+            <td>{{childElement.Pieces}}</td>
+            <td>{{childElement.Description}}</td>
+            <td>{{childElement.min_price}} {{childElement.UnitType}}</td>
+            <td>{{childElement.max_price}} {{childElement.UnitType}}</td>
+            <td>{{childElement.min_sum_price}} {{childElement.UnitType}}</td>
+            <td>{{childElement.max_sum_price}} {{childElement.UnitType}}</td>    
+
+          </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    {% endif %}
+
+
+  </div>
