@@ -225,12 +225,6 @@ ALTER TABLE `files`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
--- AUTO_INCREMENT for table `orderable`
---
-ALTER TABLE `orderable`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
 -- AUTO_INCREMENT for table `price_units`
 --
 ALTER TABLE `price_units`
