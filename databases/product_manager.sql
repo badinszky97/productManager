@@ -100,7 +100,6 @@ CREATE TABLE `file_connects` (
 --
 
 CREATE TABLE `orderable` (
-  `ID` int(11) NOT NULL,
   `VendorCode` int(11) NOT NULL,
   `ElementCode` int(11) NOT NULL,
   `orderCode` varchar(20) NOT NULL,
@@ -186,7 +185,7 @@ ALTER TABLE `file_connects`
 -- Indexes for table `orderable`
 --
 ALTER TABLE `orderable`
-  ADD PRIMARY KEY (`ID`),
+  ADD PRIMARY KEY (`VendorCode`,`ElementCode`),
   ADD KEY `VendorCodeIndex` (`VendorCode`),
   ADD KEY `ElementCodeIndex` (`ElementCode`),
   ADD KEY `PriceUnitIndex` (`PriceUnit`);

@@ -47,7 +47,6 @@ CREATE TABLE `file_connects` (
 
 DROP TABLE IF EXISTS `orderable`;
 CREATE TABLE `orderable` (
-  `ID` int(11) NOT NULL,
   `VendorCode` int(11) NOT NULL,
   `ElementCode` int(11) NOT NULL,
   `orderCode` varchar(20) NOT NULL,
@@ -98,7 +97,7 @@ ALTER TABLE `file_connects`
   ADD KEY `element_id_index` (`element_id`);
 
 ALTER TABLE `orderable`
-  ADD PRIMARY KEY (`ID`),
+  ADD PRIMARY KEY (`VendorCode`,`ElementCode`),
   ADD KEY `VendorCodeIndex` (`VendorCode`),
   ADD KEY `ElementCodeIndex` (`ElementCode`),
   ADD KEY `PriceUnitIndex` (`PriceUnit`);
@@ -145,4 +144,4 @@ ALTER TABLE `orderable`
   ADD CONSTRAINT `orderable_ibfk_1` FOREIGN KEY (`PriceUnit`) REFERENCES `price_units` (`ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `orderable_ibfk_2` FOREIGN KEY (`VendorCode`) REFERENCES `vendors` (`ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `orderable_ibfk_3` FOREIGN KEY (`ElementCode`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-SET FOREIGN_KEY_CHECKS=1;
+COMMIT;

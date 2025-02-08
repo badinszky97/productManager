@@ -39,9 +39,9 @@ class Element():
         po_array = []
         if self.conn != None:
             cur = self.conn.cursor()
-            cur.execute(f"SELECT o.id, v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
-            for (id, company, price, priceunit, link, unit, code) in cur:
-                po_array.append({'id' : id, 'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
+            cur.execute(f"SELECT v.company, o.price, pu.ShortTerm, link, unit, o.orderCode FROM orderable as o, price_units as pu, vendors as v WHERE o.PriceUnit=pu.ID and o.ElementCode={self.id} and o.VendorCode=v.ID")
+            for (company, price, priceunit, link, unit, code) in cur:
+                po_array.append({'company' : company, 'price' : price, 'priceunit' : priceunit, 'link' : link, 'unit' : unit, 'code' : code})
         return po_array
 
     @property
@@ -230,10 +230,10 @@ class Element():
             self.conn.commit()
             self.load_parameters_from_database(self.id)
 
-    def delete_purchase_opportunity(self, opportunityID):
+    def delete_purchase_opportunity(self, orderCode):
          if self.conn != None:
             cur = self.conn.cursor()
-            query = f"DELETE FROM orderable WHERE id={opportunityID}"
+            query = f"DELETE FROM orderable WHERE orderCode=\"{orderCode}\" and ElementCode={self.id}"
             print(query)
             cur.execute(query)
             self.conn.commit()       

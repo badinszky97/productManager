@@ -30,7 +30,7 @@
                 <form action="#" method="post">                
                         {% csrf_token %}
                         <input type="hidden" name="formType" value="vendorDelete">
-                        <input type="hidden" name="orderID" value="{{opportunitiy.id}}">
+                        <input type="hidden" name="orderID" value="{{opportunitiy.code}}">
                         <input type="submit" class="btn btn-danger" value="Delete"/>
                 </form>
             </td>
