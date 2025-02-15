@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{type}}{% endblock %}
+
+{% block content %}
+
+<!-- Filter -->
+<div class="mt-5">
+<form action="#" method="post" class="pt-5">    
+      Type:<br>
+      
+      <input type="radio" class="btn-check radio_hide" name="element_type" id="part" value="part" checked>
+      <label class="btn btn-secondary" for="part">Part</label>
+      
+      <input type="radio" class="btn-check radio_hide" name="element_type" id="operation" value="operation">
+      <label class="btn btn-secondary" for="operation">Operation</label>
+
+      <input type="radio" class="btn-check radio_hide" name="element_type" id="assembly" value="assembly">
+      <label class="btn btn-secondary" for="assembly">Assembly</label>
+
+      <input type="radio" class="btn-check radio_hide" name="element_type" id="product" value="product">
+      <label class="btn btn-secondary" for="product">Product</label>
+
+
+      {% csrf_token %}
+      <table class="ml-auto mr-auto">
+          <tr>
+              <td>Name</td>
+              <td><input type=text name="name"></td>
+          </tr>
+          <tr>
+              <td>Code</td>
+              <td><input type=text name="code"></td>
+          </tr>
+          <tr>
+              <td colspan=2><input type="submit" class="btn btn-primary mt-2 w-100" value="Filter"/></td>
+          </tr>
+      </table>
+                               
+
+  <input type="hidden" name="formType" value="consistFilter">
+</form>
+</div>
+<!-- End of filter -->
+
+
+
+<table class="table-striped table-dark element_table mb-3 mt-5">
+  <thead>
+      <tr>
+          <th scope="col">Icon</th>
+          <th scope="col">Name</th>
+          <th scope="col">Type</th>
+          <th scope="col">Code</th>
+          <th scope="col">Qty</th>
+          <th scope="col">Description</th>
+
+      </tr>
+      </thead>
+      <tbody>
+          {% for element in element_list %}
+              <tr>
+              <form action="#" method="post">   
+                  {% csrf_token %}
+                  <td scope="row"><img src="/media/{{element.icon}}" class="table_icon"></td>
+                  <td>{{element.name}}</td>
+                  <td>{{element.type}}</td>
+                  <td>{{element.code}}</td>
+                  <td><input type=number name="pieces" required min=0 style="width:80px;" placeholder="Qty" required></td>
+                  <td><input type=text name="description" required style="width:150px;" maxlength=8 placeholder="Description" required></td>
+                  <td><input type="submit" class="btn btn-success" value="Add"></td>
+
+                  <input type="hidden" name="formType" value="addToInventory">
+                  <input type="hidden" name="elementID" value="{{element.id}}">
+
+                  </form>
+              </tr>
+          {% endfor %}
+  </tbody>
+  </table>
+
+{% endblock %}

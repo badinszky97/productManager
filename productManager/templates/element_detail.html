@@ -73,6 +73,9 @@
       <li class="tablabel"><a href="#price">Price</a></li>
     {% endif %}
   {% endif %}
+  {% if element.type != "Project" %}
+  <li class="tablabel"><a href="#inventory">Inventory</a></li>
+  {% endif%}
 </ul>
 <div class="tab-content">
 
@@ -89,6 +92,10 @@
     {% include "elements/tree_view_tab.html" %}
     {% include "elements/price_tab.html" %}
     {% endif %}
+
+  {% if element.type != "Project" %}
+    {% include "elements/inventory_tab.html" %}
+  {% endif%}
 
 <!-- Delete element Modal - Hidden by default-->
 <div class="modal fade" id="deleteelement" tabindex="-1" role="dialog" aria-labelledby="deleteelementlabel" aria-hidden="true">

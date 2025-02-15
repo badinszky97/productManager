@@ -7,13 +7,12 @@ import time
 
 
 class Element():
-    def __init__(self, id=0, name="", type="", code="", instock=0, icon=""):
+    def __init__(self, id=0, name="", type="", code="", icon=""):
         """ Create element from scratch"""
         self.id = id
         self.name = name
         self.type = type
         self.code = code
-        self.instock = instock
         self.icon = icon
 
         self.conn = get_database_connection()
@@ -27,12 +26,37 @@ class Element():
     def load_parameters_from_database(self, part_id):
         if self.conn != None:
             cur = self.conn.cursor()
-            query = f"SELECT e.id, e.Name, t.Description, e.Code, e.InStock, IF(e.Icon IS NULL, NULL, files.path) as Icon FROM (elements as e, element_types as t) LEFT JOIN files ON files.ID=e.Icon WHERE e.ID={part_id} and e.Type=t.ID;"
+            query = f"SELECT e.id, e.Name, t.Description, e.Code, IF(e.Icon IS NULL, NULL, files.path) as Icon FROM (elements as e, element_types as t) LEFT JOIN files ON files.ID=e.Icon WHERE e.ID={part_id} and e.Type=t.ID;"
             cur.execute(query)
             
             result = cur.fetchone() 
             if(cur.rowcount > 0):
-                self.__init__(result[0], result[1], result[2], result[3], result[4], result[5])
+                self.__init__(result[0], result[1], result[2], result[3], result[4])
+
+    @property
+    def instock(self):
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT SUM(pieces) FROM inventory WHERE element_id={self.id}"
+            cur.execute(query)
+            result = cur.fetchone() 
+            if(cur.rowcount > 0):
+                if(result[0] == None):
+                    return 0
+                else:
+                    return result[0]
+        return 0
+
+    @property
+    def get_inventory(self):
+        inventory_array = []
+        if self.conn != None:
+            cur = self.conn.cursor()
+            query = f"SELECT pieces, description, date FROM inventory WHERE element_id={self.id}"
+            cur.execute(query)
+            for (pieces, description, date) in cur:
+                inventory_array.append({'pieces' : pieces, 'description' : description, 'date' : date})
+        return inventory_array            
 
     @property
     def purchaseOpportunities(self):
@@ -238,6 +262,33 @@ class Element():
             cur.execute(query)
             self.conn.commit()       
             self.load_parameters_from_database(self.id)
+    
+    def add_to_inventory(self, qty, description):
+        allow_adding_process = True
+        if self.conn != None:
+            self.conn.autocommit = False
+            for needed_element in self.consist:
+                print(str(needed_element))
+                subelement = Element()
+                subelement.load_parameters_from_database(needed_element["elementID"])
+                if(int(subelement.instock) < int(needed_element["pieces"]) * int(qty)):
+                    allow_adding_process = False
+                    break
+
+            if(allow_adding_process):
+                cur = self.conn.cursor()
+                for needed_element in self.consist:
+                    query = f"INSERT INTO inventory (element_id, pieces, description) VALUES ('{subelement.id}' ,'{str(int(needed_element["pieces"]) * -1 * int(qty))}', 'in: {needed_element["code"]}')"
+                    cur.execute(query)
+                    self.conn.commit()
+                
+                query = f"INSERT INTO inventory (element_id, pieces, description) VALUES ('{self.id}' ,'{qty}', '{description}')"
+                cur.execute(query)
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+
+
+        return allow_adding_process
  
 
 def get_all_elements(type="Part", name="", code=""):
@@ -255,8 +306,8 @@ def get_all_elements(type="Part", name="", code=""):
             print(query)
             cur.execute(query)
             all_elements = []
-            for (id, name, type, code, instock, icon) in cur:
-                current_element = Element(id, name, type, code, instock, icon)
+            for (id, name, type, code, icon) in cur:
+                current_element = Element(id, name, type, code, icon)
                 current_element.load_parameters_from_database(id)
                 all_elements.append(current_element)
             return all_elements

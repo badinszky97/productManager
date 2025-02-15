@@ -15,7 +15,6 @@ CREATE TABLE `elements` (
   `Name` varchar(30) NOT NULL,
   `Type` int(11) NOT NULL,
   `Code` varchar(10) NOT NULL,
-  `InStock` int(11) NOT NULL DEFAULT 0,
   `Icon` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
@@ -75,6 +74,15 @@ CREATE TABLE `vendors` (
   `Address` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+DROP TABLE IF EXISTS `inventory`;
+CREATE TABLE `inventory` (
+  `ID` int(11) NOT NULL,
+  `element_id` int(11) NOT NULL,
+  `pieces` int(11) NOT NULL DEFAULT 0,
+  `description` varchar(15) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
 
 ALTER TABLE `consist`
   ADD UNIQUE KEY `ContElementIndex` (`Container`,`Element`) USING BTREE,
@@ -108,6 +116,9 @@ ALTER TABLE `price_units`
 ALTER TABLE `vendors`
   ADD PRIMARY KEY (`ID`);
 
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `element_id_key` (`element_id`);
 
 ALTER TABLE `elements`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
@@ -141,4 +152,7 @@ ALTER TABLE `orderable`
   ADD CONSTRAINT `orderable_ibfk_1` FOREIGN KEY (`PriceUnit`) REFERENCES `price_units` (`ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `orderable_ibfk_2` FOREIGN KEY (`VendorCode`) REFERENCES `vendors` (`ID`) ON UPDATE CASCADE,
   ADD CONSTRAINT `orderable_ibfk_3` FOREIGN KEY (`ElementCode`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `inventory`
+  ADD CONSTRAINT `element_id_key` FOREIGN KEY (`element_id`) REFERENCES `elements` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;

@@ -254,6 +254,32 @@ def vendor_delete(request, id):
         return HttpResponseRedirect("/")
     
 # **************************************************
+# Inventory
+# **************************************************
+def inventory_view(request):
+    alerts = []
+    element_list = get_all_elements()
+    
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            if(request.POST["formType"] == "consistFilter"):
+                element_list = get_all_elements(request.POST["element_type"],request.POST["name"],request.POST["code"])
+            elif(request.POST["formType"] == "addToInventory"):
+                current_element = Element()
+                current_element.load_parameters_from_database(request.POST["elementID"])
+                allowed = current_element.add_to_inventory(request.POST["pieces"], request.POST["description"])
+                if(allowed):
+                    alerts.append({"text": 'Adding to inventory was successfull', "type" : "success"})
+                else:
+                    alerts.append({"text": 'Adding to inventory was unsuccessfull', "type" : "error"})
+                
+
+    else:
+        return HttpResponseRedirect("/")
+    
+    return render(request, 'inventory.html', {"element_list": element_list, "alerts" : alerts})
+
+# **************************************************
 # Users
 # **************************************************
 def users_view(request):

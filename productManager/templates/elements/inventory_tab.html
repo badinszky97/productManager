@@ -1,0 +1,27 @@
+{% if active_tab == "inventory" %}
+  <div id="inventory" class="tab-pane fade active show pt-3 rounded">
+{% else %}
+    <div id="inventory" class="tab-pane fade show pt-3 rounded">
+{% endif %}
+    <h3 class="pt-4">Inventory</h3>
+    {% if element.get_inventory %}
+    <table class="table-striped table-dark element_table">
+        <thead>
+        <tr>
+            <th scope="col">Pieces</th>
+            <th scope="col">Description</th>
+            <th scope="col">Date</th>
+        </tr>
+        </thead>
+        <tbody>
+    {% for inventory_element in element.get_inventory %}
+            <tr>
+            <td>{{inventory_element.pieces}}</td>
+            <td>{{inventory_element.description}}</td>
+            <td>{{inventory_element.date}}</td>
+          </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    {% endif %}
+</div>
