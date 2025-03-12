@@ -16,6 +16,7 @@ productManagerEnv/
 *$py.class 
 
 # Distribution / packaging 
+build/
 .Python build/ 
 develop-eggs/ 
 dist/ 
