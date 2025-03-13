@@ -34,7 +34,7 @@ def get_name(request):
 
     if request.user.is_authenticated:
         # Already logged in, redirect to the dashboard
-        return render(request, "dashboard.html")
+        return render(request, "dashboard.html",{"parts": str(len(get_all_elements("Part"))), "operations":str(len(get_all_elements("Operation"))), "assemblies" : str(len(get_all_elements("Assembly"))) , "products":str(len(get_all_elements("Product"))), "projects":str(len(get_all_elements("Project"))) })
     
     # if this is a POST request we need to process the form data
     if request.method == "POST":
@@ -46,7 +46,7 @@ def get_name(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return render(request, "dashboard.html")
+                return render(request, "dashboard.html",{"parts": str(len(get_all_elements("Parts"))), "operations":str(len(get_all_elements("Operations"))), "assemblies" : str(len(get_all_elements("Assemblies"))) , "products":str(len(get_all_elements("Products"))), "projects":str(len(get_all_elements("Projects"))) })
             else:
                 return render(request, "index.html", {"form": form})
     else:

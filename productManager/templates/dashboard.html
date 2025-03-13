@@ -3,5 +3,47 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<style>
+        /* Container for Metro Rectangles */
+        .metro-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* Metro Rectangle Styling */
+        .metro-rectangle {
+            background-color: #0078d4;
+            color: white;
+            width: 200px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            margin:50px;
+        }
+
+        /* Hover Effect for Metro Rectangles */
+        .metro-rectangle:hover {
+            transform: scale(1.05);
+        }
+
+
+    </style>
+
+
+    <div class="pt-5 pr-5 pl-5 metro-container">
+        <a href="/parts"><div class="metro-rectangle">Parts: {{parts}}</div></a>
+        <a href="/operations"><div class="metro-rectangle">Operations: {{operations}}</div>
+        <a href="/assemblies"><div class="metro-rectangle">Assemblies: {{assemblies}}</div>
+        <a href="/products"><div class="metro-rectangle">Products: {{products}}</div>
+        <a href="/projects"><div class="metro-rectangle">Projects: {{projects}}</div>
+    </div>
+
 
 {% endblock %}
