@@ -311,6 +311,9 @@ def myaccount_view(request):
 
     return render(request, 'my_account.html', {'form': form, 'alerts' : alerts})
 
+def aboutus_view(request):
+    return render(request, 'aboutus.html')
+
 def logout_view(request):
     if request.user.is_authenticated == True:
         logout(request)
