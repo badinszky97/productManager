@@ -74,6 +74,7 @@ def handle_uploaded_file(f, id, description):
 
 
 def element_details_view(request, id):
+    alerts = []
     print("get code: " + str(id))
     if request.user.is_authenticated:
         vendors = get_all_vendors()
@@ -122,9 +123,16 @@ def element_details_view(request, id):
 
             elif(request.POST["formType"] == "vendorDelete"):
                 current_element.delete_purchase_opportunity(request.POST["orderID"])
+            elif(request.POST["formType"] == "modifyFundamentals"):
+                name_res = current_element.modify_name(request.POST["element_name"])
+                code_res = current_element.modify_code(request.POST["element_code"])
+                if(name_res and code_res):
+                    alerts.append({"text": 'Modifying was successfull', "type" : "success"})
+                else:
+                    alerts.append({"text": 'Modifying was unsuccessfull', "type" : "error"})
             current_element.load_parameters_from_database(id)          
 
-        return render(request, 'element_detail.html', {"element": current_element, "active_tab" : active_tab, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "active_consist_modal" : active_consist_modal, "price_units" : get_all_price_units(), "filtered_parts" : filtered_parts})
+        return render(request, 'element_detail.html', {"element": current_element, "active_tab" : active_tab, "all_media" : get_all_media(), "vendors" : vendors, "newFileForm" : UploadFileForm(), "active_modal_vendor" : active_modal_vendor, "active_consist_modal" : active_consist_modal, "price_units" : get_all_price_units(), "filtered_parts" : filtered_parts, "alerts" : alerts})
     else:
         return HttpResponseRedirect("/")
     

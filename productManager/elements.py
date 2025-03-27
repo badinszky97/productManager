@@ -205,7 +205,6 @@ class Element():
             self.conn.commit()
             self.load_parameters_from_database(self.id)
 
-
     def createInDatabase(self):
         if self.conn != None:
             cur = self.conn.cursor()
@@ -290,6 +289,27 @@ class Element():
 
         return allow_adding_process
  
+    def modify_name(self, new_name):
+        if self.conn != None:
+            try:
+                cur = self.conn.cursor()
+                cur.execute(f"UPDATE elements SET Name='{new_name}' WHERE ID={self.id}")
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)  
+                return True
+            except:
+                return False
+
+    def modify_code(self, new_code):
+        if self.conn != None:
+            try:
+                cur = self.conn.cursor()
+                cur.execute(f"UPDATE elements SET Code='{new_code}' WHERE ID={self.id}")
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)  
+                return True
+            except:
+                return False
 
 def get_all_elements(type="Part", name="", code=""):
         conn = get_database_connection()
