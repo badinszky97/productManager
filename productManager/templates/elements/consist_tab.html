@@ -19,11 +19,13 @@
             <th scope="col">Pieces</th>
             <th scope="col">Modify</th>
             <th scope="col">Delete</th>
+            <th scope="col">Link</th>
         </tr>
         </thead>
         <tbody>
     {% for childElement in element.consist %}
             <tr>
+            
             <td scope="row"><img src="/media/{{childElement.icon}}" class="table_icon"></td>
             <td>{{childElement.name}}</td>
             <td>{{childElement.type}}</td>
@@ -44,6 +46,15 @@
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteconsist{{forloop.counter}}">
                     Delete
                 </button>
+            </td>
+
+            <td>
+                <!-- Link -->
+                <a href="/elements/{{childElement.elementID}}">
+                    <button type="button" class="btn btn-info">
+                        Link
+                    </button>
+                </a>
             </td>
 
 
