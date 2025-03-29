@@ -21,7 +21,7 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.get_name),
+    path('', views.dashboard_view),
     path('parts/', views.parts_view),
     path('elements/<int:id>', views.element_details_view),
     path('elements/delete/<int:id>', views.element_delete),
