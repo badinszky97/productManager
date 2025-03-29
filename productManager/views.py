@@ -158,8 +158,15 @@ def element_add(request, type, url):
             form = NewElementForm(request.POST)
             if form.is_valid():
                 newPart = Element(0, request.POST["name"], type, request.POST["code"], 0)
-                newPart.createInDatabase()
-        return HttpResponseRedirect(url) # redirect if successful
+                try:
+                    newPart.createInDatabase()
+                    return HttpResponseRedirect(url) # redirect if successful
+                except:
+                    alerts = []
+                    alerts.append({"text": 'Already existing code', "type" : "error"})
+                    return render(request, 'dashboard.html', {"alerts" : alerts})
+                    
+        
     else:
         return HttpResponseRedirect("/")
 
