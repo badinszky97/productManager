@@ -84,24 +84,30 @@ def element_details_view(request, id):
         current_element = Element()
         current_element.load_parameters_from_database(id)
         active_tab="media" # default tab
+
         if request.method == "POST":
             if(request.POST["formType"] == "uploadForm"):
                 form = UploadFileForm(request.POST, request.FILES)
                 if form.is_valid():
                     handle_uploaded_file(request.FILES["file"], id, request.POST["description"])
+
             elif(request.POST["formType"] == "vendorFilter"):
                 vendors = get_all_vendors(request.POST["company"], request.POST["address"])
                 active_modal_vendor = True
                 active_tab="vendors"
+
             elif(request.POST["formType"] == "addVendor"):
-                current_element.add_purchase_opportunity(request.POST["vendorID"],
+                res = current_element.add_purchase_opportunity(request.POST["vendorID"],
                                                          request.POST["price_unit"],
                                                          request.POST["price"],
                                                          request.POST["unit"],
                                                          request.POST["code"],
                                                          request.POST["link"]
                                                          )
+                if( not res):
+                    alerts.append({"text": 'Recursive list error during adding the element', "type" : "error"})
                 active_tab="vendors"
+
             elif(request.POST["formType"] == "consistFilter"):
                 filtered_parts = get_all_elements(request.POST["element_type"],request.POST["name"],request.POST["code"])
                 active_consist_modal = True
@@ -110,19 +116,27 @@ def element_details_view(request, id):
             elif(request.POST["formType"] == "addConsist"):
                 active_consist_modal = True
                 active_tab="consist"
-                current_element.add_consist_element(request.POST["childID"], request.POST["pieces"])
+                result = current_element.add_consist_element(request.POST["childID"], request.POST["pieces"])
+                if( not result):
+                    alerts.append({"text": 'Adding was unsuccessfull', "type" : "error"})
 
             elif(request.POST["formType"] == "consistModify"):
                 active_tab="consist"
-                current_element.modify_consist_element(request.POST["childID"], request.POST["pieces"])
+                result = current_element.modify_consist_element(request.POST["childID"], request.POST["pieces"])
+                if( not result):
+                    alerts.append({"text": 'Modifying was unsuccessfull', "type" : "error"})
 
             elif(request.POST["formType"] == "consistDelete"):
-                current_element.delete_consist_element(request.POST["childID"])
+                result = current_element.delete_consist_element(request.POST["childID"])
+                if(not result):
+                    alerts.append({"text": 'Deleting was unsuccessfull', "type" : "error"})
                 active_tab="consist"
                 
 
             elif(request.POST["formType"] == "vendorDelete"):
-                current_element.delete_purchase_opportunity(request.POST["orderID"])
+                result = current_element.delete_purchase_opportunity(request.POST["orderID"])
+                if(not result):
+                    alerts.append({"text": 'Deleting was unsuccessfull', "type" : "error"})
             elif(request.POST["formType"] == "modifyFundamentals"):
                 name_res = current_element.modify_name(request.POST["element_name"])
                 code_res = current_element.modify_code(request.POST["element_code"])
@@ -145,7 +159,7 @@ def element_delete(request, id):
 
         current_element = Element()
         current_element.load_parameters_from_database(id)
-        current_element.delete()
+        result = current_element.delete()
         
 
         return HttpResponseRedirect("/")
@@ -159,7 +173,7 @@ def element_add(request, type, url):
             if form.is_valid():
                 newPart = Element(0, request.POST["name"], type, request.POST["code"], 0)
                 try:
-                    newPart.createInDatabase()
+                    result = newPart.createInDatabase()
                     return HttpResponseRedirect(url) # redirect if successful
                 except:
                     alerts = []
@@ -219,7 +233,7 @@ def media_delete(request, id):
     if request.user.is_authenticated:
         current_element = Media("-","-")
         current_element.load_parameters_from_database(id)
-        current_element.delete()
+        result = current_element.delete()
 
         return HttpResponseRedirect("/media")
     else:
@@ -236,7 +250,7 @@ def openMedia(request, path):
 def modify_icon(self, element_id, media_path):
     part = Element()
     part.load_parameters_from_database(element_id)
-    part.change_icon(media_path)
+    result = part.change_icon(media_path)
     return HttpResponseRedirect(f"/elements/{element_id}")
 
 
@@ -252,7 +266,7 @@ def vendor_add(request):
             form = NewVendorForm(request.POST)
             if form.is_valid():
                 newVendor = Vendor(0,request.POST["company"], request.POST["address"])
-                newVendor.createInDatabase()
+                result = newVendor.createInDatabase()
         return HttpResponseRedirect("/vendors")
     else:
         return HttpResponseRedirect("/")
@@ -261,7 +275,7 @@ def vendor_delete(request, id):
     if request.user.is_authenticated:
         current_vendor = Vendor(0,"","")
         current_vendor.load_parameters_from_database(id)
-        current_vendor.delete()
+        result = current_vendor.delete()
         
 
         return HttpResponseRedirect("/vendors")

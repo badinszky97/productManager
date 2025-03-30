@@ -14,6 +14,16 @@ echo -e "Description: An application for managing a BOM hierarchy of a small/med
 
 
 chmod +x /tmp/productManager/opt/productManager/manage/manage
+
+
+cat <<EOF >> /tmp/productManager/DEBIAN/postinst
+#!/bin/bash
+
+# media mappa letrehozasa:
+mkdir -p /var/product_manager/
+
+EOF
+
 chmod 775 /tmp/productManager/DEBIAN/postinst
 
 cd /tmp

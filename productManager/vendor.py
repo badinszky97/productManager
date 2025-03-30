@@ -23,18 +23,25 @@ class Vendor():
             cur = self.conn.cursor()
             
             query = f"INSERT INTO vendors (company, address) VALUES ('{self.company}', '{self.address}')"
-            cur.execute(query)
-            self.conn.commit()
-            self.id = cur.lastrowid
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.id = cur.lastrowid
+            except:
+                return False
+            return True
 
     def delete(self):
         if self.conn != None:
             cur = self.conn.cursor()
             
             query = f"DELETE FROM vendors WHERE ID={self.id}"
-            print(str(query))
-            cur.execute(query)
-            self.conn.commit()
+            try:
+                cur.execute(query)
+                self.conn.commit()
+            except:
+                return False
+            return True
        
 def get_all_vendors(company="", address=""):
     conn = get_database_connection()

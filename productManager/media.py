@@ -19,24 +19,32 @@ class Media():
             result = cur.fetchone() 
             if(cur.rowcount > 0):
                 self.__init__(result[1],result[2],0,result[0])
-            print(self)
+            #print(self)
 
     def createInDatabase(self):
         if self.conn != None:
             cur = self.conn.cursor()
             
             query = f"INSERT INTO files (path, description) VALUES ('{self.path}', '{self.description}')"
-            cur.execute(query)
-            self.conn.commit()
-            self.id = cur.lastrowid
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.id = cur.lastrowid
+            except:
+                return False
+            return True
     
     def attachFileToElement(self, id):
         if self.conn != None:
             cur = self.conn.cursor()
             
             query = f"INSERT INTO file_connects (file_id, element_id) VALUES ('{self.id}', '{id}')"
-            cur.execute(query)
-            self.conn.commit()
+            try:
+                cur.execute(query)
+                self.conn.commit()
+            except:
+                return False
+            return True
 
     def delete(self):
         import os
@@ -44,10 +52,14 @@ class Media():
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"DELETE FROM files WHERE ID={self.id}"
-            print(str(query))
-            cur.execute(query)
-            self.conn.commit()
-            os.remove(f"{PRODUCTMANAGER_VARIABLES["media_path"]}/{self.path}")
+            #print(str(query))
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                os.remove(f"{PRODUCTMANAGER_VARIABLES["media_path"]}/{self.path}")
+            except:
+                return False
+            return True
 
 
 def get_all_media():

@@ -104,7 +104,7 @@ class Element():
 
         tree_view = tree_view + "\n" + "</div>\n"
         stop = time.time()
-        print(f"Tree execution time of {self.name}: " + str(stop-start))
+        #print(f"Tree execution time of {self.name}: " + str(stop-start))
         return tree_view
     
 
@@ -192,7 +192,7 @@ class Element():
                     pricelist, orderable, price_units WHERE orderable.ElementCode = ElementID and PriceUnit = price_units.id \
                     GROUP BY ElementID) sumlist \
                     GROUP BY Description;"
-            print(query)
+            #print(query)
             cur.execute(query)
             for (ChildName, Description, min_price, max_price, UnitType, pieces, unit) in cur:
                 price_array.append({'ChildName' : ChildName, 'Description' : Description, 'min_price' : min_price, 'max_price' : max_price, 'UnitType' : UnitType, 'pieces':pieces, 'unit':unit})
@@ -201,66 +201,111 @@ class Element():
     def change_icon(self, icon_path):
         if self.conn != None:
             cur = self.conn.cursor()
-            cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
-            self.conn.commit()
-            self.load_parameters_from_database(self.id)
+            try:
+                cur.execute(f"UPDATE elements SET Icon=(SELECT ID FROM files WHERE path='{icon_path}') WHERE ID={self.id}")
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
 
     def createInDatabase(self):
         if self.conn != None:
             cur = self.conn.cursor()
             
             query = f"INSERT INTO elements (Name, Type, Code) VALUES ('{self.name}', (SELECT ID FROM element_types WHERE description=\'{self.type}\'), '{self.code}')"
-            cur.execute(query)
-            self.conn.commit()
-            self.load_parameters_from_database(cur.lastrowid)
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.load_parameters_from_database(cur.lastrowid)
+            except:
+                return False
+            return True
     
     def delete(self):
         if self.conn != None:
             cur = self.conn.cursor()           
             query = f"DELETE FROM elements WHERE id={self.id}"
-            cur.execute(query)
-            self.conn.commit()
+            try:
+                cur.execute(query)
+                self.conn.commit()
+            except:
+                return False
+            return True
 
     def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, code, link):
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, unit, link, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
-            cur.execute(query)
-            self.conn.commit()
-            self.load_parameters_from_database(self.id)
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
 
     def add_consist_element(self, childID, pieces):
         if self.conn != None:
+            print(str(f"ADDING: {childID} {self.id}"))
+            if(int(childID) == int(self.id)):
+                print("Cannot add itself to its own list")
+                return False # prevent adding itself to its own contains list
+            child = Element()
+            child.load_parameters_from_database(childID)
+            
+            # prevent adding according to the bom list
+            for item in child.bom:
+                if(int(item["ElementID"]) == int(self.id)):
+                    return False
+            
+            #return False
             cur = self.conn.cursor()
-            print(f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})")
+            #print(f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})")
             query = f"INSERT INTO consist (Container, Element, Pieces) VALUES ('{self.id}' ,'{childID}', {pieces})"
-            cur.execute(query)
-            self.conn.commit()
-            self.load_parameters_from_database(self.id)
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
 
     def modify_consist_element(self, childID, pieces):
         if self.conn != None:
-            cur = self.conn.cursor()
-            cur.execute(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
-            self.conn.commit()
-            self.load_parameters_from_database(self.id)
+            try:
+                cur = self.conn.cursor()
+                cur.execute(f"UPDATE consist SET pieces={pieces} WHERE Element={childID} and Container={self.id}")
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
 
     def delete_consist_element(self, childID):
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"DELETE FROM consist WHERE Element={childID} and Container={self.id}"
-            cur.execute(query)
-            self.conn.commit()
-            self.load_parameters_from_database(self.id)
+            try:
+                cur.execute(query)
+                self.conn.commit()
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
 
     def delete_purchase_opportunity(self, orderCode):
          if self.conn != None:
             cur = self.conn.cursor()
             query = f"DELETE FROM orderable WHERE orderCode=\"{orderCode}\" and ElementCode={self.id}"
-            print(query)
-            cur.execute(query)
-            self.conn.commit()       
-            self.load_parameters_from_database(self.id)
+            #print(query)
+            try:
+                cur.execute(query)
+                self.conn.commit()       
+                self.load_parameters_from_database(self.id)
+            except:
+                return False
+            return True
     
     def add_to_inventory(self, qty, description):
         allow_adding_process = True
@@ -323,7 +368,7 @@ def get_all_elements(type="Part", name="", code=""):
             query = ""
             query = f"SELECT * FROM elements WHERE {type_statement} UPPER(name) LIKE UPPER('%{name}%') and UPPER(code) LIKE UPPER('%{code}%')"
             
-            print(query)
+            #print(query)
             cur.execute(query)
             all_elements = []
             for (id, name, type, code, icon) in cur:
