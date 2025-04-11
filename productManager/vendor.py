@@ -1,16 +1,44 @@
 from .settings import get_database_connection
 
 class Vendor():
+    """
+        Egy osztály, amelyik egy létező beszállítót reprezentál.
+    """
+        
     def __init__(self, id, company, address):
-        """ Create element from scratch"""
+        """
+            Az osztály konstriktora. Üres elem létrehozásakor használatos.
+            Itt készül egy új adatbáziskapcsolat ami kizárólag erre az elemre használatos.
+
+            Bementi paraméterek:
+                - id:<int> -> A fájl elérési útja (kötelező mező)
+                - company:<str> -> A cég elnevezése (kötelező mező)
+                - address:<str> -> A cég telephelyének címe (kötelező mező)
+            
+            Kimenet:
+                - Egy objektum az elem reprezentálására
+        """
         self.id = id
         self.company = company
         self.address = address
         self.conn = get_database_connection()
+
     def __str__(self):
+        """ Az objektum alapadatainak kiiratása szöveges formátumban. """
         return f"ID: {self.id}, Company: {self.company}, Address: {self.address}"
     
     def load_parameters_from_database(self, id):
+        """ 
+            Az objektum belső változóinak feltöltése az adatbázisból letöltött adatokkal.
+            A függvény lekérdezi az adatbázisból a kért elemet és feltölti az objektum következő változóit a letöltött értékekkel:
+                -id
+                -company
+                -address
+
+            Bemeneti paraméterek:
+                - id:<int> -> Az adatbázisban lévő elem egyedi azonosítója 
+        """
+
         if self.conn != None:
             cur = self.conn.cursor()
             cur.execute(f"SELECT * FROM vendors WHERE ID='{id}'")
@@ -19,6 +47,12 @@ class Vendor():
                 self.__init__(result[0],result[1],result[2])
 
     def createInDatabase(self):
+        """
+            Egy üres elem létrehozása, majd annak adatokkal történő feltöltése után ez a függvény hozza létre az elemet az adatbázisban.
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             
@@ -32,6 +66,13 @@ class Vendor():
             return True
 
     def delete(self):
+        """
+            A bejegyzés törlése az adatbázisból.
+            A destruktor nem hívódik meg automatikusan az eljárás végén.
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             
@@ -68,6 +109,9 @@ def get_all_vendors(company="", address=""):
             return []
     
 class PriceUnits():
+    """
+        A pénznemek kezelését segítő osztály. A pénznemek struktúráját tartalmazza és annak megjelenítését segíti elő.
+    """
     def __init__(self, id, unittype, shortterm):
         """ Create element from scratch"""
         self.id = id

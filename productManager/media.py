@@ -50,7 +50,6 @@ class Media():
     def createInDatabase(self):
         """
             Egy üres elem létrehozása, majd annak adatokkal történő feltöltése után ez a függvény hozza létre az elemet az adatbázisban.
-            A konzisztencia megtartása végett az objektum ezután felülírja magát az adatbázisban tárolt információkkal.
 
             Kimeneti érték:
                 - success:<boolean>
