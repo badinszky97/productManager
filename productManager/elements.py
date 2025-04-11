@@ -40,7 +40,7 @@ class Element():
         self.conn.close()
 
     def __str__(self):
-        """ Az objektum alapadatainak kiiratása sztring formátumban. """
+        """ Az objektum alapadatainak kiiratása szöveges formátumban. """
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
     def load_parameters_from_database(self, part_id):
@@ -205,7 +205,6 @@ class Element():
                 media_array.append(current_element)
         return media_array
         
-    
     @property
     def bom(self):
         """
