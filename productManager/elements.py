@@ -4,11 +4,29 @@ from joblib import Parallel,delayed
 
 import time
 
-
-
 class Element():
+    """
+        Egy osztály, amelyik egy elemet reprezentál a BOM listában. A hierarchia bármely szintjére alkalmazható, minden elem típust képes megvalósítani.
+        
+        Egy elem létrehozásához két lehetőség van:
+            - Üres elem létrehozása a konstruktor kitöltésével
+            - Elem betöltése az adatbázisból a load_parameters_from_database függvénnyel
+    """
     def __init__(self, id=0, name="", type="", code="", icon=""):
-        """ Create element from scratch"""
+        """
+            Az osztály konstriktora. Üres elem létrehozásakor használatos.
+            Itt készül egy új adatbáziskapcsolat ami kizárólag erre az elemre használatos.
+
+            Bementi paraméterek:
+                - id:<int> -> Az adatbázisban lévő egyedi azonosítója (default:0)
+                - name:<str> -> Az elem neve (default:"")
+                - type:<str> -> Az elem típusa sztringben kifejezve (default:"")
+                - code:<str> -> Az elem egyedi kódja (default:"")
+                - icon:<int> -> Referencia az elem kódjának rekorjára a fájlok táblában (default:"")
+            
+            Kimenet:
+                - Egy objektum az elem reprezentálására
+        """
         self.id = id
         self.name = name
         self.type = type
@@ -16,14 +34,28 @@ class Element():
         self.icon = icon
 
         self.conn = get_database_connection()
-        #self.conn.autocommit = True
+
     def __del__(self):
+        """ Az osztály destruktora. Törlés előtt az élő adatbáziskapcsolat bontása. """
         self.conn.close()
 
     def __str__(self):
+        """ Az objektum alapadatainak kiiratása sztring formátumban. """
         return f"ID: {self.id}, Name: {self.name}, Type: {self.type}, Code: {self.code}, InStock: {self.instock}, Icon: {self.icon}"
     
     def load_parameters_from_database(self, part_id):
+        """ 
+            Az objektum belső változóinak feltöltése az adatbázisból letöltött adatokkal.
+            A függvény lekérdezi az adatbázisból a kért elemet és feltölti az objektum következő változóit a letöltött értékekkel:
+                -id
+                -name
+                -type
+                -code
+                -icon
+
+            Bemeneti paraméterek:
+                - part_id:<int> -> Az adatbázisban lévő elem egyedi azonosítója 
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"SELECT e.id, e.Name, t.Description, e.Code, IF(e.Icon IS NULL, NULL, files.path) as Icon FROM (elements as e, element_types as t) LEFT JOIN files ON files.ID=e.Icon WHERE e.ID={part_id} and e.Type=t.ID;"
@@ -35,6 +67,13 @@ class Element():
 
     @property
     def instock(self):
+        """
+            @property
+            Visszaadja egy elem raktárkészletét az adatbázisból.
+            Visszatérési értékként egy összesített számot ad, amely az adattáblában lévő beszerzések értékének összege.
+            Kimeneti érték:
+                - raktárkészlet:<int>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"SELECT SUM(pieces) FROM inventory WHERE element_id={self.id}"
@@ -49,6 +88,18 @@ class Element():
 
     @property
     def get_inventory(self):
+        """
+            @property
+            Visszaadja egy elem beszerzési történetét az adatbázis alapján.
+            Kimentként egy lista várandó amit tartalmazza az összes rekordot a beszerzések táblából, a szükséges mezők:
+                - pieces
+                - description
+                - date
+            Ennek a függvénynek a pieces mezőinek összesítése adja az instock() függvény eredményét.
+
+            Kimeneti érték:
+                - beszerzési_lista:<list> -> {"pieces", "description", "date"}
+        """
         inventory_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -60,6 +111,12 @@ class Element():
 
     @property
     def purchaseOpportunities(self):
+        """
+            @property
+            Visszaadja egy elem beszerzési lehetőségeit az adatbázisból.
+            Kimeneti érték:
+                - beszerzési_lista:<list> -> {"company", "price", "priceunit", "link", "unit", "code"}
+        """
         po_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -70,6 +127,15 @@ class Element():
 
     @property
     def consist(self):
+        """
+            @property
+            Visszaadja, hogy az adott elem milyen más elemeket tartalmaz. A hierachia szint lefelé történő kibontása egy listába.
+            A kibontás gyökérelemét minden esetben az objektum ID-ja határozza meg, ami nem egy bemenő paraméter.
+            Visszatérési értékként egy listát ad az elemek adataival.
+
+            Kimeneti érték:
+                - tartalmaz_lista:<list> -> {"name", "pieces", "type", "icon", "code", "elementID"}
+        """
         consist_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -81,6 +147,15 @@ class Element():
 
     @property
     def consist_short_list(self):
+        """
+            @property
+            Visszaadja, hogy az adott elem milyen más elemeket tartalmaz. A hierachia szint lefelé történő kibontása egy listába.
+            A kibontás gyökérelemét minden esetben az objektum ID-ja határozza meg, ami nem egy bemenő paraméter.
+            Visszatérési értékként egy listát ad amely az elemek objektumait tartalmazza.
+
+            Kimeneti érték:
+                - tartalmaz_lista:<list>
+        """
         consist_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -94,6 +169,11 @@ class Element():
 
     @property
     def get_tree_diagram_piece(self):
+        """
+            Az elem és az ő által tartalmazott más elemek fa diagramjának kirajzolása HTML kódban.
+            Kimeneti érték:
+                -kód:<str> -> A HTML kódba közvetlenül beilleszthető kódrészlet amely a fa struktúra kirajzolását valósítja meg.
+        """
         start = time.time()
         tree_view = f"<div class=\"entry\">\n<span>{self.name}</span>\n"
         if(len(self.consist) > 0):
@@ -104,12 +184,18 @@ class Element():
 
         tree_view = tree_view + "\n" + "</div>\n"
         stop = time.time()
-        #print(f"Tree execution time of {self.name}: " + str(stop-start))
         return tree_view
     
-
     @property
     def mediaList(self):
+        """
+            @property
+            Visszaadja, hogy az adott elemhez milyen fájlok vannak feltöltve az adatbázisban.
+            Visszatérési értékként egy listát ad amely a feltöltött fájlok objektumait tartalmazza.
+
+            Kimeneti érték:
+                - fájl_lista:<list>
+        """
         media_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -122,6 +208,15 @@ class Element():
     
     @property
     def bom(self):
+        """
+            @property
+            Visszaadja az elem rekurzívan kidolgozott BOM listáját.
+            A gyökér elem minden esetben az adott elem.
+            A rekurzív feldolgozást az adatbázis valósítja meg.
+
+            Kimeneti érték:
+                - fájl_lista:<list> -> {"ContainerID", "ElementID", "Pieces", "ChildName", "Type", "Icon"}
+        """
         bom_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -164,6 +259,15 @@ class Element():
     
     @property
     def prices(self):
+        """
+            @property
+            Visszaadja az elem BOM listájának az adatbázisban rögzített árainak összesítését.
+            Ebben a listában szerepel az összes elem amit a szülő tartalmaz és azoknak az árai.
+            Az árak mint egységár és mint darabszámmal felszorozott összesített ár is megjelennek.
+
+            Kimeneti érték:
+                - fájl_lista:<list> -> {"ElementID", "Pieces", "ChildName", "Description", "Icon", "min_price", "max_price", "min_sum_price", "max_sum_price", "UnitType"}
+        """
         price_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -181,6 +285,15 @@ class Element():
     
     @property
     def sum_price(self):
+        """
+            @property
+            Visszaadja az elem BOM listájának az adatbázisban rögzített árainak összesítését.
+            Ebben a listában szerepel az összes elem amit a szülő tartalmaz és azoknak az árai.
+            Az árak mint egységár és mint darabszámmal felszorozott összesített ár is megjelennek.
+
+            Kimeneti érték:
+                - fájl_lista:<list> -> {"ChildName", "Description", "min_price", "max_price", "UnitType", "pieces", "unit"}
+        """
         price_array = []
         if self.conn != None:
             cur = self.conn.cursor()
@@ -199,6 +312,15 @@ class Element():
         return price_array
 
     def change_icon(self, icon_path):
+        """
+            Megváltoztatja az adatbázisban az elemhez rendelt ikon referenciát.
+
+            Bemeneti érték:
+                - icon_path:<int> -> A referencia a fájlok listához
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             try:
@@ -210,6 +332,13 @@ class Element():
             return True
 
     def createInDatabase(self):
+        """
+            Egy üres elem létrehozása, majd annak adatokkal történő feltöltése után ez a függvény hozza létre az elemet az adatbázisban.
+            A konzisztencia megtartása végett az objektum ezután felülírja magát az adatbázisban tárolt információkkal.
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             
@@ -223,6 +352,13 @@ class Element():
             return True
     
     def delete(self):
+        """
+            Ez az eljárás kitörli az elemet az adatbázisból. Az objektum konstruktora nem hívódik meg automatikusan ebből.
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
+
         if self.conn != None:
             cur = self.conn.cursor()           
             query = f"DELETE FROM elements WHERE id={self.id}"
@@ -234,6 +370,20 @@ class Element():
             return True
 
     def add_purchase_opportunity(self, vendorCode, priceUnit, price, unit, code, link):
+        """
+            Hozzáad az elemhez egy beszerzési lehetőséget az adatbázisban.
+            Bemeneti értékek:
+                - beszállító_kód:<str>
+                - pénznem:<int> -> az adatbázisban tárolt értékek közüli ID
+                - ár:<int>
+                - egység:<str>
+                - Beszerzési_kód:<str>
+                - link:<str>
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
+
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"INSERT INTO orderable (VendorCode, ElementCode, PriceUnit, Price, unit, link, orderCode) VALUES ({vendorCode}, '{self.id}' ,'{priceUnit}', {price}, '{unit}', '{link}', '{code}')"
@@ -246,6 +396,16 @@ class Element():
             return True
 
     def add_consist_element(self, childID, pieces):
+        """
+            Egy elem hozzárendelése az adott objektumhoz. Ezzel a hierarchiában alá-fölé rendeltségi viszonyban lesznek.
+            Bemeneti értékek:
+                - childID:<int> -> a hozzáadandó elem ID-je
+                - pieces:<int> ->  hozzáadandó darabszám
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
+
         if self.conn != None:
             print(str(f"ADDING: {childID} {self.id}"))
             if(int(childID) == int(self.id)):
@@ -272,6 +432,15 @@ class Element():
             return True
 
     def modify_consist_element(self, childID, pieces):
+        """
+            Egy korábban már hozzáadott elem darabszámának módosítása a hierarchia fában.
+            Bemeneti értékek:
+                - childID:<int> -> a módosítandó elem ID-je
+                - pieces:<int> ->  darabszám
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             try:
                 cur = self.conn.cursor()
@@ -283,6 +452,14 @@ class Element():
             return True
 
     def delete_consist_element(self, childID):
+        """
+            Egy korábban már hozzáadott elem törlése a listából, így kikerül az alá-fölé rendeltségi hierarchiából.
+            Bemeneti értékek:
+                - childID:<int> -> a törlendő elem ID-je
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             cur = self.conn.cursor()
             query = f"DELETE FROM consist WHERE Element={childID} and Container={self.id}"
@@ -295,10 +472,17 @@ class Element():
             return True
 
     def delete_purchase_opportunity(self, orderCode):
-         if self.conn != None:
+        """
+            Egy korábban már hozzáadott beszerzési lehetőség törlése az adatbázisból.
+            Bemeneti értékek:
+                - orderCode:<int> -> a törlendő elem ID-je
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
+        if self.conn != None:
             cur = self.conn.cursor()
             query = f"DELETE FROM orderable WHERE orderCode=\"{orderCode}\" and ElementCode={self.id}"
-            #print(query)
             try:
                 cur.execute(query)
                 self.conn.commit()       
@@ -308,6 +492,15 @@ class Element():
             return True
     
     def add_to_inventory(self, qty, description):
+        """
+            Egy beszerzés regisztrálása az adatbázisban. Ezzel a függvénnyel növelhető (vagy akár csökkenthető) a raktárkészlete az adott terméknek.
+            Bemeneti értékek:
+                - qty:<int> -> a darabszám
+                - description:<str> -> leírás a beszerzéshez (pl számla sorszám)
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         allow_adding_process = True
         if self.conn != None:
             self.conn.autocommit = False
@@ -335,6 +528,14 @@ class Element():
         return allow_adding_process
  
     def modify_name(self, new_name):
+        """
+            Módosítja az elem nevét az adatbázisban
+            Bemeneti értékek:
+                - new_name:<str> -> az új név
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             try:
                 cur = self.conn.cursor()
@@ -346,6 +547,14 @@ class Element():
                 return False
 
     def modify_code(self, new_code):
+        """
+            Módosítja az elem kódját az adatbázisban
+            Bemeneti értékek:
+                - new_code:<str> -> az új kód
+
+            Kimeneti érték:
+                - success:<boolean>
+        """
         if self.conn != None:
             try:
                 cur = self.conn.cursor()
